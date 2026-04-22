@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Na Chapa</title>
+    <!-- Favicon simples usando emoji -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    
+    <style>
+        :root {
+            --vermelho: #c1121f;
+            --vermelho-escuro: #800000;
+            --amarelo: #ffdd57;
+            --marrom: #8B4513;
+            --marrom-claro: #f4e1d2;
+            --creme: #fff3e0;
+            --verde: #2a9d8f;
+            --azul: #457b9d;
+            --cinza: #6c757d;
+            --branco: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--creme);
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .right {
+            flex: 1;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            color: var(--vermelho);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--cinza);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--vermelho);
+            background: white;
+        }
+
+        select.form-control {
+            background: #f8f9fa;
+        }
+
+        a.link {
+            color: var(--vermelho);
+            text-align: right;
+            font-size: 0.9rem;
+            text-decoration: none;
+            margin-top: 0.5rem;
+        }
+
+        a.link:hover {
+            text-decoration: underline;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cancelar {
+            background: var(--cinza);
+            color: white;
+        }
+
+        .cancelar:hover {
+            background: #5a6268;
+        }
+
+        .logar, #voltar {
+            background: var(--vermelho);
+            color: white;
+        }
+
+        .logar:hover, #voltar:hover {
+            background: var(--vermelho-escuro);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-legal a {
+            color: var(--amarelo);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        .footer-legal a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .left {
+                height: 200px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* REMOVIDO: Estilos para a seção de login desnecessária */
+
+        /* Overlay para escurecer o fundo quando o login estiver aberto */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Adicione isso ao final do <style> se desejar um destaque extra */
+        .form-control[readonly] {
+            background: #f0f0f0;
+            cursor: not-allowed;
+            color: #666;
+            border: 2px solid #ccc; /* Opcional: borda mais clara */
+        }
+
+        #camposComuns {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Estilos fundamentais para o modal de "Esqueci minha senha" */
+        .modal {
+            display: none; /* Fundamental: oculto por padrão */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); /* Fundo semi-transparente */
+        }
+
+        .modal-content {
+            background-color: var(--branco);
+            margin: 15% auto; /* Centraliza verticalmente */
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px; /* Largura máxima */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: var(--cinza);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--vermelho);
+            text-decoration: none;
+        }
+
+        .overlay {
+            display: none; /* Fundamental: oculto por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); /* Escurece o fundo */
+            z-index: 999;
+        }
+
+        /* Responsividade fundamental para o modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+
+        /* Adicione isso ao final da tag <style> */
+
+        /* Esconder seções não ativas */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Estilos para as novas seções (opcional, para consistência) */
+        .content-section h3 {
+            color: var(--vermelho);
+            margin-bottom: 1rem;
+        }
+
+        .content-section p, .content-section ul {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .content-section ul {
+            padding-left: 1.5rem;
+        }
+
+        /* Aumentar espaço lateral nas seções Sobre e Parceiros para mais "respirabilidade" */
+        #sobre, #parceiros {
+            padding-left: 3rem; /* Espaço maior na borda esquerda */
+            padding-right: 3rem; /* Espaço maior na borda direita */
+            /* Mantém padding-top e padding-bottom padrão */
+        }
+
+        /* Responsividade: Reduzir espaço lateral em telas menores */
+        @media (max-width: 768px) {
+            #sobre, #parceiros {
+                padding-left: 1.5rem; /* Menor em mobile */
+                padding-right: 1.5rem;
+            }
+        }
+
+        /* Adicione isso ao final da tag <style> */
+
+        /* Banner de mensagens de erro/sucesso */
+        .message-banner {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .message-banner.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-banner.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .close-banner {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        /* Spinner de loading */
+        .loading-spinner {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--vermelho);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Feedback visual nos campos: bordas para válido/inválido */
+        .form-control.valid {
+            border-color: var(--verde); /* Verde para válido */
+            background-color: #f0fff0; /* Fundo leve verde */
+        }
+
+        .form-control.invalid {
+            border-color: #dc3545; /* Vermelho para inválido */
+            background-color: #fff5f5; /* Fundo leve vermelho */
+        }
+
+        /* Ajuste para foco: mantém vermelho, mas sobrescreve se válido */
+        .form-control:focus.valid {
+            border-color: var(--verde);
+        }
+
+        .form-control:focus.invalid {
+            border-color: #dc3545;
+        }
+
+        /* Atualize o estilo existente do .message-banner */
+        .message-banner {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Adicione transform e box-shadow à transição */
+        }
+
+        .message-banner.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-banner.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Adicione este novo estilo para o hover */
+        .message-banner:hover {
+            transform: translateY(-5px); /* Eleva o banner para cima */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* Aumenta a sombra para efeito de "elevação" */
+            cursor: pointer; /* Indica que é interativo */
+        }
+
+        /* Adicione isso ao final da tag <style> */
+
+        /* Estilos para botões de login social */
+        .btn-social {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 0.5rem;
+        }
+
+        .btn-social:hover {
+            border-color: var(--vermelho);
+            background: var(--marrom-claro);
+        }
+
+        .btn-social.google:hover {
+            color: #4285f4; /* Azul do Google */
+        }
+
+        .btn-social.facebook:hover {
+            color: #1877f2; /* Azul do Facebook */
+        }
+
+        /* Responsividade para social login */
+        @media (max-width: 768px) {
+            .social-login {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-social {
+                width: 100%;
+                max-width: 200px;
+                margin: 0.5rem 0;
+            }
+        }
+
+        nav a.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* ========== CORREÇÕES PARA O CAMPO SENHA ========== */
+
+        /* Container para o campo de senha e ícone */
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Ícone do olho */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+            user-select: none;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        /* Efeito hover no ícone */
+        .toggle-password:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Efeito quando ativo (clicado) */
+        .toggle-password.active {
+            background-color: rgba(193, 18, 31, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Ajuste no campo de senha para dar espaço ao ícone */
+        .password-field {
+            padding-right: 45px !important;
+        }
+
+        /* Estilos para as opções logo abaixo do campo senha */
+        .form-options {
+            display: flex;
+            justify-content: space-between; /* Checkbox à esquerda, link à direita */
+            align-items: center; /* Alinha verticalmente */
+            margin-top: 8px; /* Uns 2 milímetros abaixo do campo senha (aprox. 8px) */
+            margin-left: 12px; /* Alinha horizontalmente com o input (igual ao padding-left do .form-control) */
+            margin-right: 12px; /* Alinha horizontalmente com o input (igual ao padding-right do .form-control) */
+        }
+
+        .lembrar-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* Espaço entre checkbox e label */
+        }
+
+        .lembrar-me label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--cinza); /* Usa a cor do sistema */
+        }
+
+        .form-options .link {
+            font-size: 0.9rem;
+            text-decoration: none;
+            color: var(--vermelho);
+        }
+
+        .form-options .link:hover {
+            text-decoration: underline;
+        }
+
+        /* Adicione no final do <style> */
+        .lembrar-me label:hover {
+            color: black; /* Muda a cor do texto para preto no hover */
+            cursor: pointer; /* Indica que é interativo */
+        }
+
+        /* Adicione no final do <style> */
+        .lembrar-me label:has(input:checked) {
+            color: black; /* Muda a cor do texto para preto quando o checkbox estiver marcado */
+        }
+
+        /* Estilos para as seções do footer (similar aos parceiros) */
+        #privacidade, #termos, #cookies {
+            padding: 2rem 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        #privacidade h2, #termos h2, #cookies h2 {
+            color: var(--vermelho);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2rem;
+            border-bottom: 3px solid var(--marrom-claro);
+            padding-bottom: 1rem;
+        }
+
+        #privacidade h3, #termos h3, #cookies h3 {
+            color: var(--vermelho);
+            margin: 2rem 0 1rem 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #privacidade h3::before, #termos h3::before, #cookies h3::before {
+            content: "•";
+            color: var(--amarelo);
+            font-size: 1.8rem;
+        }
+
+        #privacidade p, #termos p, #cookies p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: #555;
+            text-align: justify;
+        }
+
+        #privacidade ul, #termos ul, #cookies ul {
+            margin-bottom: 2rem;
+            padding-left: 2rem;
+        }
+
+        #privacidade li, #termos li, #cookies li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        #privacidade li::before, #termos li::before, #cookies li::before {
+            content: "➤";
+            color: var(--vermelho);
+            position: absolute;
+            left: -1rem;
+        }
+
+        #privacidade strong, #termos strong, #cookies strong {
+            color: var(--marrom);
+        }
+
+        /* Container principal das seções */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Botão de voltar nas seções do footer */
+        .btn-voltar {
+            background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 3rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(193, 18, 31, 0.3);
+        }
+
+        .btn-voltar:hover {
+            background: linear-gradient(135deg, var(--vermelho-escuro) 0%, #600000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(193, 18, 31, 0.4);
+        }
+
+        /* Responsividade para as seções do footer */
+        @media (max-width: 768px) {
+            #privacidade, #termos, #cookies {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            #privacidade h2, #termos h2, #cookies h2 {
+                font-size: 1.6rem;
+            }
+            
+            #privacidade h3, #termos h3, #cookies h3 {
+                font-size: 1.2rem;
+            }
+            
+            .form-container {
+                padding: 0;
+            }
+        }
+
+        /* Estilo para links do footer quando ativos */
+        .footer-legal a.active {
+            background-color: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        /* Efeito hover para links do footer */
+        .footer-legal a:hover {
+            background-color: rgba(255,255,255,0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        /* Estilos para as seções Sobre e Parceiros (similar ao footer) */
+        #sobre, #parceiros {
+            padding: 2rem 3rem;
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        #sobre h2, #parceiros h2 {
+            color: var(--vermelho);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2rem;
+            border-bottom: 3px solid var(--marrom-claro);
+            padding-bottom: 1rem;
+        }
+
+        #sobre h3, #parceiros h3 {
+            color: var(--vermelho);
+            margin: 2rem 0 1rem 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #sobre h3::before, #parceiros h3::before {
+            content: "•";
+            color: var(--amarelo);
+            font-size: 1.8rem;
+        }
+
+        #sobre p, #parceiros p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: #555;
+            text-align: justify;
+        }
+
+        #sobre ul, #parceiros ul {
+            margin-bottom: 2rem;
+            padding-left: 2rem;
+        }
+
+        #sobre li, #parceiros li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        #sobre li::before, #parceiros li::before {
+            content: "➤";
+            color: var(--vermelho);
+            position: absolute;
+            left: -1rem;
+        }
+
+        #sobre strong, #parceiros strong {
+            color: var(--marrom);
+        }
+
+        /* Botão de voltar para Sobre e Parceiros */
+        #sobre .btn-voltar, #parceiros .btn-voltar {
+            background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 3rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(193, 18, 31, 0.3);
+        }
+
+        #sobre .btn-voltar:hover, #parceiros .btn-voltar:hover {
+            background: linear-gradient(135deg, var(--vermelho-escuro) 0%, #600000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(193, 18, 31, 0.4);
+        }
+            
+            #sobre h2, #parceiros h2 {
+                font-size: 1.6rem;
+            }
+            
+            #sobre h3, #parceiros h3 {
+                font-size: 1.2rem;
+            }
+
+            /* Estilos para os botões do modal de "Esqueci minha senha" */
+#formEsqueciSenha .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#formEsqueciSenha .buttons button {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+/* Responsividade para os botões */
+@media (max-width: 768px) {
+    #formEsqueciSenha .buttons button {
+        font-size: 0.8rem;
+    }
+}
+
+/* Estilos para os inputs do código de 6 dígitos */
+.codigo-inputs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.codigo-digit {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: border-color 0.3s;
+}
+
+.codigo-digit:focus {
+    outline: none;
+    border-color: var(--vermelho);
+}
+
+/* Responsividade para inputs do código */
+@media (max-width: 768px) {
+    .codigo-digit {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+
+/* Estilos para seções ocultas do modal */
+#codigoSection, #novaSenhaSection {
+    text-align: center;
+}
+
+#codigoSection h3, #novaSenhaSection h3 {
+    color: var(--vermelho);
+    margin-bottom: 1rem;
+}
+
+/* Estilo para o botão Voltar na seção do código */
+#codigoSection .cancelar {
+    margin-top: 1rem;
+}
+
+/* Estilos para o aviso de credenciais incorretas */
+.aviso-credenciais {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.aviso-credenciais.mostrar {
+    display: block;
+}
+
+/* ========== NOVOS ESTILOS PARA AVISOS PADRONIZADOS ========== */
+.aviso-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    width: 90%;
+    max-width: 400px;
+    display: none;
+}
+
+.aviso {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: avisoEntrada 0.4s ease-out;
+}
+
+@keyframes avisoEntrada {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.aviso-header {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.aviso.atencao .aviso-header {
+    background-color: #fff3cd;
+    color: #856404;
+    border-bottom: 1px solid #ffeaa7;
+}
+
+.aviso.urgente .aviso-header {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-bottom: 1px solid #f5c6cb;
+}
+
+.aviso.sucesso .aviso-header {
+    background-color: #d4edda;
+    color: #155724;
+    border-bottom: 1px solid #c3e6cb;
+}
+
+.aviso-body {
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.aviso-footer {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #e9ecef;
+}
+
+.aviso-footer button {
+    padding: 8px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.aviso.atencao .aviso-footer button {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.aviso.atencao .aviso-footer button:hover {
+    background-color: #e0a800;
+}
+
+.aviso.urgente .aviso-footer button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.aviso.urgente .aviso-footer button:hover {
+    background-color: #c82333;
+}
+
+.aviso.sucesso .aviso-footer button {
+    background-color: #28a745;
+    color: white;
+}
+
+.aviso.sucesso .aviso-footer button:hover {
+    background-color: #218838;
+}
+
+.aviso-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1999;
+    display: none;
+}
+
+/* Responsividade para avisos */
+@media (max-width: 768px) {
+    .aviso-container {
+        width: 95%;
+    }
+    
+    .aviso-header {
+        padding: 12px 15px;
+        font-size: 1rem;
+    }
+    
+    .aviso-body {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .aviso-footer {
+        padding: 12px 15px;
+    }
+}
+        
+    </style>
+</head>
+<body>
+    
+    <header>
+        <h1>🍔 Na Chapa</h1>
+        <nav>
+            <td>Login: joni.rj@hotmail.com <br> 
+                     Senha: 565601</td>
+        </nav>
+    </header>
+             
+    <div class="container">
+        <div class="left">
+            <img src="Burger.gif" alt="Animação de um hambúrguer">
+        </div>
+
+        <div class="right" id="loginSection">
+            <h2>Acesso ao Sistema</h2>
+
+            <div id="avisoCredenciais" class="aviso-credenciais">
+                ❌ Email ou senha incorretos. Por favor, tente novamente.
+            </div>
+
+            <div id="loadingSpinner" class="loading-spinner hidden">
+                <div class="spinner"></div>
+                <p>Processando login...</p>
+            </div>
+
+            <form id="formLogin" action="login.php" method="POST">
+                <div id="camposComuns">
+                    <div class="form-group">
+                        <label for="emailLogin">Email</label>
+                        <input type="email" id="emailLogin" name="email" class="form-control" placeholder="Ex: email@dominio.com" required maxlength="254">
+                    </div>
+                    <div class="password-container">
+    <input type="password" class="form-control password-field"
+           id="senhaLogin" 
+           placeholder="Ex: senha*007" 
+           required maxlength="20"
+           autocomplete="new-password">
+    <span class="toggle-password">👁️‍🗨️</span>
+</div>
+                        
+                        <div class="form-options">
+                            <div class="lembrar-me">
+                                <label><input type="checkbox" id="lembrar-me" name="lembrar" style="width: auto;"> Lembrar-me</label>
+                            </div>
+                            <a href="#" class="link" onclick="abrirModalEsqueciSenha()">Esqueci minha senha</a>
+                        </div>
+                    </div>
+
+                <div class="buttons">
+                    <button type="reset" class="cancelar">Limpar</button>
+                    <button type="submit" class="logar">Logar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="esqueciSenhaModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('esqueciSenhaModal').style.display='none'">&times;</span>
+            <h2>Redefinir Senha</h2>
+            
+            <form id="formEsqueciSenha" action="processar_redefinicao.php" method="POST">
+                <div class="form-group">
+                    <label for="emailRecuperacao">Email Cadastrado</label>
+                    <input type="email" id="emailRecuperacao" name="email_recuperacao" class="form-control" placeholder="Digite seu email para recuperação" required>
+                </div>
+                
+                <p style="text-align: center; margin: 1.5rem 0 0.5rem;">Escolha o método de envio do código:</p>
+                <div class="buttons">
+                    <button type="button" id="btnEnviarEmail" class="logar">Enviar Código por Email</button>
+                    <button type="button" id="btnEnviarSMS" class="logar">Enviar Código por SMS</button>
+                </div>
+            </form>
+
+            </div>
+    </div>
+
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Na Chapa - Todos os direitos reservados. Desenvolvido por Jonathas Trevezani.</p>
+            
+        </div>
+    </footer>
+
+   <script>
+    // Função Mínima para abrir o Modal
+    function abrirModalEsqueciSenha() {
+        document.getElementById('esqueciSenhaModal').style.display = 'block';
+    }
+
+    // Função Mínima para Fechar o Modal clicando fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('esqueciSenhaModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Lógica Mínima para mostrar/esconder a senha
+    document.querySelector('.toggle-password').addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️‍🗨️' : '🔒'; // Troca o ícone
+    });
+
+/// ========== LOGIN COM API ==========
+document.getElementById('formLogin').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // 1. Coletar dados
+    const email = document.getElementById('emailLogin').value;
+    const senha = document.getElementById('senhaLogin').value;
+
+    // 2. Validação básica
+    if (!email || !senha) {
+        mostrarAviso('Por favor, preencha todos os campos.', 'erro');
+        return;
+    }
+
+    // 3. Mostrar Loading
+    document.getElementById('loadingSpinner').classList.remove('hidden');
+    const botao = document.querySelector('.logar');
+    botao.disabled = true;
+    botao.textContent = 'Entrando...';
+
+    // 4. Dados para envio
+    const dadosLogin = {
+        email: email,
+        senha: senha
+    };
+
+    try {
+
+        // 5. Requisição para API
+        const response = await fetch('login.php?action=login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dadosLogin)
+        });
+
+        // 6. Ler resposta com segurança
+        const text = await response.text();
+
+        console.log("RESPOSTA BRUTA:", text);
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error("Resposta não é JSON válido");
+            mostrarAviso('Erro no servidor.', 'erro');
+            return;
+        }
+
+        // 7. Sucesso
+        if (response.ok && data.success) {
+
+            mostrarAviso('Login realizado com sucesso!', 'sucesso');
+
+            const lembrarMe = document.getElementById('lembrar-me').checked;
+
+            if (lembrarMe && data.user) {
+                localStorage.setItem('usuarioLogado', JSON.stringify(data.user));
+            } else {
+                sessionStorage.setItem('usuarioLogado', JSON.stringify(data.user));
+            }
+
+            setTimeout(() => {
+
+                const usuario = data.user;
+
+                localStorage.setItem('nomeUsuario', usuario.nome || 'Usuário');
+                localStorage.setItem('nivelUsuario', usuario.nivel || 'funcionario');
+
+                window.location.href = `Dashboard.html?nivel=${usuario.nivel || 'funcionario'}`;
+
+            }, 1500);
+
+        } else {
+            // Erro da API
+            mostrarAviso(data.message || 'Erro ao fazer login.', 'erro');
+        }
+
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        mostrarAviso('Não foi possível conectar ao servidor.', 'erro');
+
+    } finally {
+        // 8. Reset UI
+        document.getElementById('loadingSpinner').classList.add('hidden');
+        botao.disabled = false;
+        botao.textContent = 'Logar';
+    }
+});
+
+    // ========== FUNÇÃO PARA MOSTRAR AVISOS ==========
+    function mostrarAviso(mensagem, tipo) {
+        const aviso = document.getElementById('avisoCredenciais');
+        aviso.textContent = mensagem;
+        
+        // Remove classes antigas
+        aviso.classList.remove('success', 'error');
+        
+        // Adiciona classe conforme o tipo
+        if (tipo === 'sucesso') {
+            aviso.classList.add('success');
+            aviso.innerHTML = '✅ ' + mensagem;
+        } else {
+            aviso.classList.add('error');
+            aviso.innerHTML = '❌ ' + mensagem;
+        }
+        
+        aviso.classList.add('mostrar');
+        
+        // Auto-esconder após 5 segundos
+        setTimeout(() => {
+            aviso.classList.remove('mostrar');
+        }, 5000);
+    }
+
+    // ========== VERIFICAR SE HÁ USUÁRIO SALVO (LEMBRAR-ME) ==========
+    function verificarUsuarioSalvo() {
+        const usuarioSalvo = localStorage.getItem('usuarioLogado') || sessionStorage.getItem('usuarioLogado');
+        if (usuarioSalvo) {
+            const usuario = JSON.parse(usuarioSalvo);
+            document.getElementById('emailLogin').value = usuario.email || '';
+            // Não preenchemos a senha por segurança
+        }
+    }
+
+    // ========== FUNÇÕES PARA "ESQUECI MINHA SENHA" ==========
+    document.getElementById('btnEnviarEmail').addEventListener('click', function() {
+        const email = document.getElementById('emailRecuperacao').value;
+        
+        if (!email) {
+            alert('Por favor, digite seu email.');
+            return;
+        }
+        
+        // Aqui você implementaria a lógica para enviar código por email
+        alert('Um código de verificação foi enviado para: ' + email);
+        // Fechar modal após envio
+        document.getElementById('esqueciSenhaModal').style.display = 'none';
+    });
+
+    document.getElementById('btnEnviarSMS').addEventListener('click', function() {
+        const email = document.getElementById('emailRecuperacao').value;
+        
+        if (!email) {
+            alert('Por favor, digite seu email.');
+            return;
+        }
+        
+        // Aqui você implementaria a lógica para enviar código por SMS
+        alert('Um código de verificação foi enviado por SMS para o número vinculado ao email: ' + email);
+        // Fechar modal após envio
+        document.getElementById('esqueciSenhaModal').style.display = 'none';
+    });
+
+    // ========== INICIALIZAÇÃO ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verificar se há usuário salvo
+        verificarUsuarioSalvo();
+        
+        // Destacar link ativo
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage === 'index.html') {
+            document.querySelector('nav a[href="index.html"]').classList.add('active');
+        }
+    });
+</script>
+</body>
+</html>

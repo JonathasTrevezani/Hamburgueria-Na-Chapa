@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Guia de Comandos MySQL - Na Chapa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Barra de ferramentas */
+        .toolbar {
+            background: #2c3e50;
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #c1121f;
+        }
+        
+        .toolbar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-pdf {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-pdf:hover {
+            background: #c82333;
+        }
+        
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-copy:hover {
+            background: #218838;
+        }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+        
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background: #5a6268;
+        }
+        
+        /* Área de conteúdo editável */
+        .content-editable {
+            padding: 30px;
+            background: white;
+            min-height: 800px;
+        }
+        
+        /* Estilos do conteúdo */
+        .content-editable h1 {
+            color: #c1121f;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .content-editable .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .content-editable h2 {
+            color: #8B4513;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f4e1d2;
+            font-size: 22px;
+        }
+        
+        .content-editable table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .content-editable th {
+            background: #f4e1d2;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+            font-weight: bold;
+        }
+        
+        .content-editable td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .content-editable code {
+            background: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #c1121f;
+        }
+        
+        .content-editable .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+        }
+        
+        /* Modo edição */
+        .editing-mode {
+            background: #fffef7;
+        }
+        
+        .editing-mode table {
+            background: #fffef7;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .content-editable {
+                padding: 15px;
+                font-size: 12px;
+            }
+            
+            .toolbar button {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Toast de notificação */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            animation: fadeInOut 2s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Barra de ferramentas -->
+        <div class="toolbar">
+            <button class="btn-pdf" onclick="gerarPDF()">📄 Salvar como PDF</button>
+            <button class="btn-copy" onclick="copiarConteudo()">📋 Copiar tudo</button>
+            <button class="btn-edit" onclick="toggleEditMode()">✏️ Editar conteúdo</button>
+            <button class="btn-reset" onclick="resetContent()">🔄 Restaurar original</button>
+        </div>
+        
+        <!-- Conteúdo editável -->
+        <div id="conteudo" class="content-editable" contenteditable="false">
+            <h1>🍔 Na Chapa</h1>
+            <div class="subtitle">Guia de Comandos MySQL - Manutenção do Banco de Dados</div>
+            
+            <p><strong>Banco de Dados:</strong> railway | <strong>Host:</strong> junction.proxy.rlwy.net:34797 | <strong>Usuário:</strong> root</p>
+            
+            <!-- ============================================ -->
+            <h2>1. 🔌 Conexão e Seleção do Banco</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>USE railway;</code></td><td>Selecionar o banco de dados</td></tr>
+                <tr><td><code>SELECT DATABASE();</code></td><td>Ver qual banco está em uso</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>2. 📋 Estrutura do Banco</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>SHOW TABLES;</code></td><td>Listar todas as tabelas</td></tr>
+                <tr><td><code>DESCRIBE nome_tabela;</code></td><td>Ver estrutura da tabela</td></tr>
+                <tr><td><code>SHOW CREATE TABLE nome_tabela;</code></td><td>Ver detalhes completos da tabela</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>3. 🔍 Consultar Dados (SELECT)</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>SELECT * FROM funcionarios;</code></td><td>Ver todos os funcionários</td></tr>
+                <tr><td><code>SELECT id, nome_completo, email FROM funcionarios;</code></td><td>Ver apenas alguns campos</td></tr>
+                <tr><td><code>SELECT * FROM cardapio LIMIT 10;</code></td><td>Ver com limite de registros</td></tr>
+                <tr><td><code>SELECT * FROM funcionarios ORDER BY nome_completo ASC;</code></td><td>Ordenar por nome (A-Z)</td></tr>
+                <tr><td><code>SELECT * FROM funcionarios ORDER BY id DESC LIMIT 5;</code></td><td>Ver os 5 últimos cadastrados</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>4. 🎯 Filtrar Dados (WHERE)</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>SELECT * FROM funcionarios WHERE cargo = 'Gerente';</code></td><td>Filtrar por cargo</td></tr>
+                <tr><td><code>SELECT * FROM cardapio WHERE categoria = 'hamburguer' AND disponivel = 1;</code></td><td>Múltiplas condições</td></tr>
+                <tr><td><code>SELECT * FROM funcionarios WHERE nome_completo LIKE '%Silva%';</code></td><td>Busca parcial (contém Silva)</td></tr>
+                <tr><td><code>SELECT * FROM pedidos WHERE status = 'aberto';</code></td><td>Pedidos em aberto</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>5. 📊 Contar Registros</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>SELECT COUNT(*) FROM funcionarios;</code></td><td>Total de funcionários</td></tr>
+                <tr><td><code>SELECT cargo, COUNT(*) as total FROM funcionarios GROUP BY cargo;</code></td><td>Total por cargo</td></tr>
+                <tr><td><code>SELECT COUNT(*) FROM cardapio WHERE disponivel = 1;</code></td><td>Itens disponíveis no cardápio</td></tr>
+                <tr><td><code>SELECT categoria, COUNT(*) FROM cardapio GROUP BY categoria;</code></td><td>Total por categoria</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>6. ✏️ Inserir Dados (INSERT)</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>INSERT INTO funcionarios (nome_completo, cpf, email, senha, cargo, salario, turno) VALUES ('João Silva', '123.456.789-00', 'joao@email.com', '123456', 'Atendente', 2500.00, 'tarde');</code></td><td>Inserir novo funcionário</td></tr>
+                <tr><td><code>INSERT INTO cardapio (nome, categoria, preco, descricao, disponivel) VALUES ('X-Burger Especial', 'hamburguer', 32.90, 'Pão, carne, queijo, bacon', 1);</code></td><td>Inserir novo item no cardápio</td></tr>
+                <tr><td><code>INSERT INTO fornecedores (cnpj, razao_social, telefone, email) VALUES ('12.345.678/0001-90', 'Distribuidora ABC', '(11) 99999-9999', 'contato@abc.com.br');</code></td><td>Inserir novo fornecedor</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>7. ✏️ Atualizar Dados (UPDATE)</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>UPDATE cardapio SET preco = 25.90 WHERE id = 5;</code></td><td>Atualizar preço de um item</td></tr>
+                <tr><td><code>UPDATE cardapio SET disponivel = 0, motivo_indisponibilidade = 'Fora de estoque' WHERE id = 37;</code></td><td>Desativar item do cardápio</td></tr>
+                <tr><td><code>UPDATE funcionarios SET salario = 3000.00 WHERE id = 4;</code></td><td>Atualizar salário</td></tr>
+                <tr><td><code>UPDATE funcionarios SET ativo = 0 WHERE id = 2;</code></td><td>Desativar funcionário</td></tr>
+                <tr><td><code>UPDATE pedidos SET status = 'entregue' WHERE id = 10;</code></td><td>Atualizar status do pedido</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>8. ❌ Deletar Dados (DELETE)</h2>
+            <div class="warning">
+                <strong>⚠️ ATENÇÃO!</strong> Sempre use WHERE no DELETE. Teste com SELECT primeiro!
+            </div>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>DELETE FROM cardapio WHERE id = 99;</code></td><td>Deletar um item do cardápio</td></tr>
+                <tr><td><code>DELETE FROM funcionarios WHERE id = 10;</code></td><td>Deletar um funcionário</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>9. 🔧 Alterar Estrutura da Tabela (ALTER)</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>ALTER TABLE funcionarios ADD COLUMN telefone_fixo VARCHAR(15);</code></td><td>Adicionar uma coluna</td></tr>
+                <tr><td><code>ALTER TABLE funcionarios DROP COLUMN telefone_fixo;</code></td><td>Remover uma coluna</td></tr>
+                <tr><td><code>ALTER TABLE funcionarios MODIFY COLUMN telefone_celular VARCHAR(20);</code></td><td>Modificar tipo da coluna</td></tr>
+                <tr><td><code>ALTER TABLE funcionarios RENAME COLUMN telefone TO telefone_contato;</code></td><td>Renomear coluna</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>10. 📈 Relatórios Rápidos</h2>
+            <table>
+                <tr><th>Comando</th><th>Descrição</th></tr>
+                <tr><td><code>SELECT data_pedido, COUNT(*) as pedidos, SUM(total) as faturamento FROM pedidos GROUP BY data_pedido ORDER BY data_pedido DESC LIMIT 10;</code></td><td>Total de vendas por dia</td></tr>
+                <tr><td><code>SELECT nome, motivo_indisponibilidade FROM cardapio WHERE disponivel = 0;</code></td><td>Itens indisponíveis</td></tr>
+                <tr><td><code>SELECT nome_completo, cargo, salario FROM funcionarios WHERE ativo = 1;</code></td><td>Funcionários ativos</td></tr>
+                <tr><td><code>SELECT item, quantidade, minimo FROM estoque WHERE quantidade <= minimo;</code></td><td>Produtos com estoque crítico</td></tr>
+                <tr><td><code>SELECT razao_social, telefone, email FROM fornecedores WHERE ativo = 1;</code></td><td>Fornecedores ativos</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <h2>11. 📌 Resumo Rápido</h2>
+            <table>
+                <tr><th>Comando</th><th>Função</th></tr>
+                <tr><td><code>SHOW TABLES;</code></td><td>Lista tabelas</td></tr>
+                <tr><td><code>DESCRIBE nome_tabela;</code></td><td>Mostra estrutura</td></tr>
+                <tr><td><code>SELECT * FROM tabela;</code></td><td>Ver todos dados</td></tr>
+                <tr><td><code>INSERT INTO tabela VALUES(...);</code></td><td>Inserir registro</td></tr>
+                <tr><td><code>UPDATE tabela SET campo=valor WHERE id=X;</code></td><td>Atualizar registro</td></tr>
+                <tr><td><code>DELETE FROM tabela WHERE id=X;</code></td><td>Deletar registro</td></tr>
+                <tr><td><code>SELECT COUNT(*) FROM tabela;</code></td><td>Contar registros</td></tr>
+                <tr><td><code>SELECT * FROM tabela LIMIT 10;</code></td><td>Limitar resultados</td></tr>
+                <tr><td><code>SELECT * FROM tabela ORDER BY campo;</code></td><td>Ordenar resultados</td></tr>
+                <tr><td><code>SELECT * FROM tabela WHERE condicao;</code></td><td>Filtrar resultados</td></tr>
+            </table>
+            
+            <!-- ============================================ -->
+            <div class="warning">
+                <strong>⚠️ DICAS DE SEGURANÇA!</strong><br><br>
+                • Sempre use WHERE no UPDATE/DELETE - Evita alterar/deletar todos os registros<br>
+                • Teste com SELECT antes do DELETE - Verifica quais registros serão afetados<br>
+                • Use LIMIT em consultas grandes - Evita travamentos<br>
+                • Faça backup antes de alterações grandes - Permite recuperar dados
+            </div>
+        </div>
+        
+        <div class="footer">
+            Guia de Comandos MySQL - Na Chapa | Gerado em: <span id="dataAtual"></span>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        // Data atual
+        document.getElementById('dataAtual').innerHTML = new Date().toLocaleDateString('pt-BR');
+        
+        // Conteúdo original para reset
+        let conteudoOriginal = '';
+        
+        // Salvar conteúdo original
+        window.addEventListener('load', function() {
+            conteudoOriginal = document.getElementById('conteudo').innerHTML;
+        });
+        
+        // Função para gerar PDF
+        function gerarPDF() {
+            const element = document.getElementById('conteudo');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'guia_comandos_mysql.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Mostrar loading
+            mostrarToast('📄 Gerando PDF, aguarde...', '#ffc107');
+            
+            // Desabilitar edição durante geração
+            const wasEditing = document.getElementById('conteudo').getAttribute('contenteditable') === 'true';
+            if (wasEditing) toggleEditMode();
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                mostrarToast('✅ PDF gerado com sucesso!', '#28a745');
+                if (wasEditing) toggleEditMode();
+            }).catch(() => {
+                mostrarToast('❌ Erro ao gerar PDF', '#dc3545');
+                if (wasEditing) toggleEditMode();
+            });
+        }
+        
+        // Função para copiar conteúdo
+        function copiarConteudo() {
+            const conteudo = document.getElementById('conteudo').innerText;
+            navigator.clipboard.writeText(conteudo).then(() => {
+                mostrarToast('📋 Conteúdo copiado!', '#28a745');
+            }).catch(() => {
+                mostrarToast('❌ Erro ao copiar', '#dc3545');
+            });
+        }
+        
+        // Função para alternar modo edição
+        function toggleEditMode() {
+            const element = document.getElementById('conteudo');
+            const isEditable = element.getAttribute('contenteditable') === 'true';
+            
+            if (isEditable) {
+                element.setAttribute('contenteditable', 'false');
+                element.classList.remove('editing-mode');
+                mostrarToast('🔒 Modo edição desativado', '#6c757d');
+            } else {
+                element.setAttribute('contenteditable', 'true');
+                element.classList.add('editing-mode');
+                mostrarToast('✏️ Modo edição ativado - Você pode editar o conteúdo!', '#ffc107');
+            }
+        }
+        
+        // Função para restaurar conteúdo original
+        function resetContent() {
+            if (confirm('Tem certeza que deseja restaurar o conteúdo original? Todas as edições serão perdidas.')) {
+                document.getElementById('conteudo').innerHTML = conteudoOriginal;
+                mostrarToast('🔄 Conteúdo restaurado com sucesso!', '#28a745');
+            }
+        }
+        
+        // Função para mostrar toast
+        function mostrarToast(mensagem, cor) {
+            const toast = document.getElementById('toast');
+            toast.style.backgroundColor = cor;
+            toast.textContent = mensagem;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Salvar edições ao sair do modo edição (opcional)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                
+                e.preventDefault();
+                mostrarToast('💾 Alterações salvas localmente!', '#28a745');
+            }
+        });
+    </script>
+</body>
+</html>

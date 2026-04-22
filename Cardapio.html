@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Na Chapa - Cardápio</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Favicon simples usando emoji -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+
+</head>
+
+<body>
+
+    <!-- Barra de Acessibilidade -->
+    <div class="accessibility-bar">
+        <div class="accessibility-item voice-icon" id="voiceToggle" data-tooltip="Leitor de Voz">
+            <span class="icon">🔊</span>
+        </div>
+    </div>
+
+    <!-- Bolinha do Atendente IA -->
+    <div class="assistant-bar">
+        <div class="assistant-item" id="assistantToggle" data-tooltip="Assistente Virtual" onclick="toggleAssistant()">
+            <span class="assistant-icon">🤖</span>
+        </div>
+    </div>
+
+    <!-- Modal do Chat -->
+    <div id="assistant-modal" class="chat-modal">
+        <div class="chat-header">
+            <h3>🤖 Atendente  Na Chapa</h3>
+            <button class="chat-close" onclick="closeAssistant()">×</button>
+        </div>
+        <div class="chat-body">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Mensagens serão inseridas aqui -->
+            </div>
+            <div class="suggested-questions">
+                <div class="suggestion" onclick="askQuestion('Qual o horário de funcionamento?')">⏰ Horários</div>
+                <div class="suggestion" onclick="askQuestion('Aonde vocês ficam localizados?')">📍 Endereço</div>
+                <div class="suggestion" onclick="askQuestion('Qual é o cardápio?')">🍔 Cardápio</div>
+                <div class="suggestion" onclick="askQuestion('Quais são as promoções?')">💰 Promoções</div>
+                <div class="suggestion" onclick="askQuestion('Fazem delivery?')">🚚 Entrega</div>
+                <div class="suggestion" onclick="askQuestion('Como entrar em contato?')">📞 Contatos</div>
+                <div class="suggestion" onclick="askQuestion('Muito obrigado(a) pelo atendimento!')">😊 Agredecimento
+                </div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Digite a sua mensagem..."
+                onkeypress="handleChatInput(event)">
+            <button class="send-button" onclick="sendMessage()">
+                <i class="fas fa-paper-plane">Enviar</i>
+            </button>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <h1>Na Chapa</h1>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#hamburgueres">Hambúrgueres</a></li>
+                    <li><a href="#acompanhamentos">Acompanhamentos</a></li>
+                    <li><a href="#bebidas">Bebidas</a></li>
+                    <li><a href="#sobremesas">Sobremesas</a></li>
+                </ul>
+                <!-- Carrinho FORA da lista, mas DENTRO do nav -->
+                <div class="nav-carrinho" onclick="abrirPedido()">
+                    <div class="carrinho-info">
+                        <span class="carrinho-icon">🛒</span>
+                        <span id="carrinho-quantidade">0</span>
+                    </div>
+                    <div class="carrinho-texto" id="carrinho-texto">Item</div>
+                    <div class="carrinho-total">
+                        <span id="carrinho-total">R$ 0,00</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="back-to-top" id="backToTop" onclick="scrollToTop()" data-tooltip="Topo da Página">
+        <span class="back-to-top-icon">↑</span>
+    </div>
+
+    <!-- ===== CARROSSEL DE DESTAQUES ===== -->
+    <section class="carrossel-destaques">
+        <div class="carrossel-wrapper"> <!-- NOVO container wrapper -->
+            <h2>Destaques da Semana</h2>
+            <div class="carrossel-container">
+                <div class="carrossel-track" id="carrossel-track">
+                    <!-- Itens do carrossel -->
+                </div>
+
+                <div class="carrossel-indicadores" id="carrossel-indicadores">
+                    <!-- Indicadores -->
+                </div>
+            </div>
+            <!-- Setas FORA do container do carrossel -->
+            <button class="carrossel-btn carrossel-prev" onclick="moverCarrossel(-1)">&#10094;</button>
+            <button class="carrossel-btn carrossel-next" onclick="moverCarrossel(1)">&#10095;</button>
+        </div>
+    </section>
+
+    <main class="container">
+
+      <!-- SEÇÃO HAMBÚRGUERES COMPLETA -->
+<section id="hamburgueres"><br>
+    <h2>Hambúrgueres</h2>
+    <div class="cardapio-grid" id="grid-hamburgueres">
+        <!-- Itens serão carregados dinamicamente -->
+    </div>
+</section>
+
+<!-- SEÇÃO ACOMPANHAMENTOS -->
+<section id="acompanhamentos">
+    <h2>Acompanhamentos</h2>
+    <div class="cardapio-grid" id="grid-acompanhamentos">
+        <!-- Itens serão carregados dinamicamente -->
+    </div>
+</section>
+
+<!-- SEÇÃO BEBIDAS -->
+<section id="bebidas">
+    <h2>Bebidas</h2>
+    <div class="cardapio-grid" id="grid-bebidas">
+        <!-- Itens serão carregados dinamicamente -->
+    </div>
+</section>
+
+<!-- SEÇÃO SOBREMESAS -->
+<section id="sobremesas">
+    <h2>Sobremesas</h2>
+    <div class="cardapio-grid" id="grid-sobremesas">
+        <!-- Itens serão carregados dinamicamente -->
+    </div>
+</section>
+
+        <!-- MODAL ÚNICO PARA TODOS OS PRODUTOS -->
+
+
+        <div id="product-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Produto</h2>
+                    <span class="close" onclick="closeProductModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="product-price">
+                    </div>
+                    <h3 class="product-ingredients-title">Ingredientes</h3> <!-- <-- NOVA LINHA ADICIONADA -->
+                    <p class="product-description" id="modal-description">Descrição do produto</p>
+                    <hr>
+                    <div class="customization-section" id="customization-content">
+                        <!-- CONTEÚDO DINÂMICO - ADICIONAIS ESPECÍFICOS PARA CADA TIPO DE PRODUTO -->
+                    </div>
+
+                    
+                </div>
+                <div class="modal-footer">
+                    <div class="total-price">
+                        <span>Total: </span>
+                        <span id="total-price">R$ 0,00</span>
+                    </div>
+                    <button class="advance-btn" onclick="adicionarProdutoPersonalizado()">Adicionar ao Pedido</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal do Pedido -->
+        <div id="pedido-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Meu Pedido</h2>
+                    <span class="close" onclick="fecharPedido()">&times;</span>
+                </div>
+                <div class="modal-body" id="lista-pedidos">
+                    <p>Nenhum item adicionado ainda 😋</p>
+                </div>
+
+                <!-- ADICIONE ESTA SEÇÃO AQUI (OBSERVAÇÃO POR PEDIDO) -->
+        <div class="observacoes-pedido">
+            <h4>📝 Observações do Pedido</h4>
+            <textarea id="observacoes-pedido" 
+                      placeholder="Alguma observação para o pedido? (opcional)
+        Ex.: Entregar após às 19h, não tocar a campainha, talheres a menos, etc."
+                      rows="3"
+                      maxlength="500"></textarea>
+        </div>
+
+                <div class="modal-footer">
+                    <span><strong id="total-pedido"></strong></span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-bottom">
+            <div class="copyright">
+                <p><strong> WhatsApp:</strong> (21) 90000-0000 | <strong>📧 Email:</strong> joni.rj@hotmail.com |
+                    <strong>🗺️ Endereço: Rua Arthur - Travessa Goulart - Centro, Duque de Caxias - RJ,
+                        25070-020</strong>
+                </p>
+            </div>
+            <div class="copyright"></div>
+            <p>&copy; 2026 Na Chapa - Todos os direitos reservados. Desenvolvido por Jonathas Trevezani.</p>
+        </div>
+    </footer>
+
+
+    <script>
+
+        // Debug: Verificar se finalizarPedido é async
+console.log('finalizarPedido é async?', finalizarPedido.constructor.name === 'AsyncFunction');
+
+// Debug: Verificar se há outros awaits problemáticos
+const codigo = document.querySelector('script').innerHTML;
+const linhasComAwait = codigo.split('\n').filter(linha => linha.includes('await'));
+console.log('Linhas com await:', linhasComAwait);
+
+
+
+
+
+
+        // ===== INICIALIZAÇÃO SEGURA DO CARROSSEL =====
+function inicializarVariaveisCarrossel() {
+    if (typeof carrosselIndex === 'undefined') {
+        carrosselIndex = 0;
+    }
+    if (typeof carrosselInterval === 'undefined') {
+        carrosselInterval = null;
+    }
+    if (typeof destaques === 'undefined') {
+        destaques = [];
+    }
+    if (typeof window.destaques === 'undefined') {
+        window.destaques = [];
+    }
+}
+
+// Chame esta função no DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarVariaveisCarrossel();
+    carregarCardapioDoBanco();
+});
+
+
+        // Estado atual
+        let voiceActive = false;
+        let isReading = false;
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // Função para ler texto
+        function speakText(text) {
+            if (!voiceActive) return;
+            if (isReading) speechSynthesis.cancel();
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'pt-BR';
+            currentUtterance.rate = 1.0;
+            currentUtterance.pitch = 1.0;
+            isReading = true;
+
+            currentUtterance.onend = function () {
+                isReading = false;
+            };
+
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        // Função para parar leitura
+        function stopSpeaking() {
+            speechSynthesis.cancel();
+            isReading = false;
+        }
+
+        // Alternar modo de voz
+        voiceToggle.addEventListener('click', () => {
+            voiceActive = !voiceActive;
+            if (voiceActive) {
+                alert("Leitor de voz ativado! Passe o mouse sobre o texto para ouvir.");
+            } else {
+                stopSpeaking();
+                alert("Leitor de voz desativado.");
+            }
+        });
+
+        // Ao passar o mouse sobre textos
+
+        let lastSpeakTime = 0;  // Throttle para evitar leituras rápidas demais
+
+        document.addEventListener('mouseover', function (event) {
+            const element = event.target;
+
+            // Verificações rigorosas para prevenir disparos automáticos
+            if (!element || !event.relatedTarget) return;
+            if (window.getComputedStyle(element).display === 'none' || window.getComputedStyle(element).visibility === 'hidden') return;
+            if (element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'style') return;
+
+            // Verificação de posição do mouse: Só lê se o mouse estiver dentro do retângulo do elemento
+            const rect = element.getBoundingClientRect();
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            if (mouseX < rect.left || mouseX > rect.right || mouseY < rect.top || mouseY > rect.bottom) return;
+
+            let text = '';
+
+            // Verificações específicas para ícones (leitura personalizada)
+            if (element.id === 'voiceToggle' || element.closest('#voiceToggle')) {
+                text = 'Leitor de voz';
+            } else if (element.id === 'assistantToggle' || element.closest('#assistantToggle')) {
+                text = 'Assistente virtual';
+            } else {
+                // Para outros elementos, lê o textContent completo se for relevante
+                text = element.textContent?.trim() || '';
+                if (text.length < 1) return;  // Ignora elementos sem texto
+            }
+
+            // Throttle maior: Só lê se passou pelo menos 1000ms (1s) desde a última leitura (para mais atenção)
+            const now = Date.now();
+            if (now - lastSpeakTime < 1000) return;
+
+            if (!text) return;
+            if (voiceActive) {
+                console.log('Lendo com atenção:', text, 'Elemento:', element.tagName);  // Debug: remova depois
+                speakText(text);
+                lastSpeakTime = now;
+            }
+        });
+
+        console.log("✅ Sistema de acessibilidade (voz e libras) carregado com sucesso!");
+
+        // ===== VARIÁVEIS GLOBAIS =====
+        let pedido = [];
+        let total = 0;
+        let currentProduct = {
+            name: '',
+            basePrice: 0,
+            type: '',
+            description: ''
+        };
+
+        let currentAdditions = {};
+        let tipoEntregaSelecionado = 'retirada';
+        let enderecoEntrega = {};
+        const productModal = document.getElementById("product-modal");
+
+       // ===== SISTEMA DE MODAL ÚNICO =====
+function openProductModal(name, price, description, type) {
+    currentProduct = { name: name, basePrice: price, type: type, description: description };
+    document.getElementById('modal-title').textContent = name + ' (R$ ' + price.toFixed(2).replace('.', ',') + ')';
+    document.getElementById('modal-description').textContent = description;
+    generateCustomizationContent(type);
+    
+    // Linha removida porque você não tem mais o campo product-notes no HTML
+    
+    updateProductTotal();
+    productModal.style.display = 'block';
+}
+
+function closeProductModal() {
+    productModal.style.display = 'none';
+}
+
+        // ===== GERADOR DE CONTEÚDO DINÂMICO =====
+        function generateCustomizationContent(type) {
+            const contentDiv = document.getElementById('customization-content');
+            let html = '';
+            currentAdditions = {};
+
+            if (type === 'hamburguer') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize o seu Hambúrguer</h3>' +
+                    '<div class="additions-section">' +
+                    '<p class="addition-limit">Adicionais até 5 unidades</p>' +
+                    createAdditionItem('carne', 'Carne Extra', 4.00) +
+                    createAdditionItem('queijo', 'Queijo Extra', 2.00) +
+                    createAdditionItem('bacon', 'Bacon Extra', 3.00) +
+                    createAdditionItem('ovo', 'Ovo', 2.00) +
+                    createAdditionItem('jalapeno', 'Pimenta-jalapenho', 1.50) +
+                    '</div>';
+            } else if (type === 'acompanhamento') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize o seu Acompanhamento</h3>' +
+                    '<div class="additions-section">' +
+                    '<p class="addition-limit">Adicione extras</p>' +
+                    createAdditionItem('bacon', 'Bacon', 3.00) +
+                    createAdditionItem('queijo', 'Queijo Cheddar', 2.50) +
+                    createAdditionItem('cheddar', 'Molho Cheddar', 2.00) +
+                    createAdditionItem('catupiry', 'Catupiry', 2.50) +
+                    '</div>';
+            } else if (type === 'bebida') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize a sua Bebida</h3>' +
+                    '<div class="additions-section">' +
+                    '<h4>Opções</h4>' +
+                    createAdditionItem('gelo', 'Sem Gelo', 0.00) +
+                    createAdditionItem('limao', 'Com Limão', 1.00) +
+                    createAdditionItem('acucar', 'Sem Açúcar', 0.00) +
+                    '</div>' +
+                    '<div class="size-section">' +
+                    '<h4>Tamanho</h4>' +
+                    createSizeOption('pequeno', 'Pequeno (300ml)', 0) +
+                    createSizeOption('medio', 'Médio (500ml)', 3.00) +
+                    createSizeOption('grande', 'Grande (700ml)', 5.00) +
+                    '</div>';
+            } else if (type === 'agua') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize a sua Bebida</h3>' +
+                    '<div class="size-section">' +
+                    '<h4>Tipo</h4>' +
+                    '<label class="size-option-square">' +
+                    '<input type="radio" name="agua-tipo" value="sem-gas" checked onchange="updateAguaPrice()">' +
+                    '<span class="square-checkmark"></span>' +
+                    '<div class="size-option-text">Sem Gás - R$ 4,90</div>' +
+                    '</label>' +
+                    '<label class="size-option-square">' +
+                    '<input type="radio" name="agua-tipo" value="com-gas" onchange="updateAguaPrice()">' +
+                    '<span class="square-checkmark"></span>' +
+                    '<div class="size-option-text">Com Gás - R$ 6,50</div>' +
+                    '</label>' +
+                    '</div>';
+            } else if (type === 'sobremesa') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize a sua Sobremesa</h3>' +
+                    '<div class="additions-section">' +
+                    '<h4>Extras</h4>' +
+                    createAdditionItem('chantilly', 'Chantilly', 2.00) +
+                    createAdditionItem('calda', 'Calda Extra', 1.50) +
+                    createAdditionItem('sorvete', 'Bola de Sorvete', 3.00) +
+                    createAdditionItem('castanha', 'Castanhas', 2.50) +
+                    '</div>';
+            } else if (type === 'vegano') {
+                html = '<div class="additions-section h3">' +
+                    '<h3>Personalize seu Hambúrguer Vegano</h3>' +
+                    '<div class="additions-section">' +
+                    '<p class="addition-limit">Adicionais até 5 unidades</p>' +
+                    createAdditionItem('abacate', 'Abacate', 3.00) +
+                    createAdditionItem('cebola', 'Cebola Caramelizada', 2.00) +
+                    createAdditionItem('cogumelo', 'Cogumelos Grelhados', 3.50) +
+                    createAdditionItem('rucula', 'Rúcula Extra', 1.50) +
+                    createAdditionItem('molho', 'Molho Vegano Especial', 2.00) +
+                    '</div>';
+            }
+
+            contentDiv.innerHTML = html;
+        }
+
+        function updateAguaPrice() {
+            const aguaTipo = document.querySelector('input[name="agua-tipo"]:checked');
+            if (aguaTipo && aguaTipo.value === 'com-gas') {
+                currentProduct.basePrice = 6.50;
+            } else {
+                currentProduct.basePrice = 4.90;
+            }
+            updateProductTotal();
+        }
+
+        function createAdditionItem(id, name, price) {
+            currentAdditions[id] = { name: name, price: price, quantity: 0 };
+            return '<div class="addition-item">' +
+                '<div class="addition-info">' +
+                '<h4>' + name + '</h4>' +
+                '<span class="addition-price">R$ ' + price.toFixed(2) + '</span>' +
+                '</div>' +
+                '<div class="addition-controls">' +
+                '<button class="quantity-btn" onclick="decrementAddition(\'' + id + '\')">-</button>' +
+                '<span id="' + id + '-quantity" class="quantity">0</span>' +
+                '<button class="quantity-btn" onclick="incrementAddition(\'' + id + '\')">+</button>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function createSizeOption(id, name, extraPrice) {
+            var extraText = extraPrice > 0 ? '(+ R$ ' + extraPrice.toFixed(2) + ')' : '';
+            return '<label class="size-option-square">' +  // Mudei a classe para size-option-square
+                '<input type="radio" name="size" value="' + id + '" onchange="updateProductTotal()" ' + (id === 'pequeno' ? 'checked' : '') + '>' +
+                '<span class="square-checkmark"></span>' +  // Mudei para square-checkmark
+                '<div class="size-option-text">' + name + ' ' + extraText + '</div>' +
+                '</label>';
+        }
+
+        // ===== CONTROLES DE QUANTIDADE =====
+        function incrementAddition(additionId) {
+            if (currentAdditions[additionId].quantity < 5) {
+                currentAdditions[additionId].quantity++;
+                document.getElementById(additionId + '-quantity').textContent = currentAdditions[additionId].quantity;
+                updateProductTotal();
+            }
+        }
+
+        function decrementAddition(additionId) {
+            if (currentAdditions[additionId].quantity > 0) {
+                currentAdditions[additionId].quantity--;
+                document.getElementById(additionId + '-quantity').textContent = currentAdditions[additionId].quantity;
+                updateProductTotal();
+            }
+        }
+
+        function updateProductTotal() {
+            let totalPrice = currentProduct.basePrice;
+
+            for (let additionId in currentAdditions) {
+                totalPrice += currentAdditions[additionId].price * currentAdditions[additionId].quantity;
+            }
+
+            const selectedSize = document.querySelector('input[name="size"]:checked');
+            if (selectedSize) {
+                const sizePrice = getSizePrice(selectedSize.value);
+                totalPrice += sizePrice;
+            }
+
+            document.getElementById('total-price').textContent = 'R$ ' + totalPrice.toFixed(2);
+        }
+
+        function getSizePrice(size) {
+            const prices = { 'pequeno': 0, 'medio': 3.00, 'grande': 5.00 };
+            return prices[size] || 0;
+        }
+
+        // ===== ADICIONAR PRODUTO PERSONALIZADO =====
+        function adicionarProdutoPersonalizado() {
+            let precoFinal = currentProduct.basePrice;
+            let personalizacoes = [];
+            let nomeCompleto = currentProduct.name;
+
+            for (let additionId in currentAdditions) {
+                const addition = currentAdditions[additionId];
+                if (addition.quantity > 0) {
+                    precoFinal += addition.price * addition.quantity;
+                    personalizacoes.push(addition.quantity + 'x ' + addition.name);
+                }
+            }
+
+            const selectedSize = document.querySelector('input[name="size"]:checked');
+            if (selectedSize && selectedSize.value !== 'pequeno') {
+                const sizePrice = getSizePrice(selectedSize.value);
+                precoFinal += sizePrice;
+                const sizeName = selectedSize.value === 'medio' ? 'Médio' : 'Grande';
+                personalizacoes.push('Tamanho: ' + sizeName);
+            }
+
+            // Adicionar tipo da água
+            if (currentProduct.type === 'agua') {
+                const aguaTipo = document.querySelector('input[name="agua-tipo"]:checked');
+                if (aguaTipo) {
+                    const tipoNome = aguaTipo.value === 'com-gas' ? 'Com Gás' : 'Sem Gás';
+                    personalizacoes.push('Tipo: ' + tipoNome);
+                }
+            }
+
+            if (personalizacoes.length > 0) {
+                nomeCompleto += ' (' + personalizacoes.join(', ') + ')';
+            }
+
+            pedido.push({ nome: nomeCompleto, preco: precoFinal });
+            total += precoFinal;
+            atualizarBarra();
+            closeProductModal();
+            showNotification(currentProduct.name + ' adicionado ao pedido!', 'success');
+        }
+
+        // ===== Carrinho de Compras =====
+        function atualizarBarra() {
+            const qtd = document.getElementById('carrinho-quantidade');
+            const valor = document.getElementById('carrinho-total');
+            const texto = document.getElementById('carrinho-texto');
+
+            qtd.textContent = pedido.length;
+            valor.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+
+            // Atualiza o texto para singular ou plural
+            if (pedido.length <= 1) {
+                texto.textContent = 'Pedido';  // 0 ou 1 item = "Pedido"
+            }
+        }
+
+        function abrirPedido() {
+            const modal = document.getElementById('pedido-modal');
+            const lista = document.getElementById('lista-pedidos');
+            const totalPedido = document.getElementById('total-pedido');
+
+            modal.style.display = 'block';
+
+            if (pedido.length === 0) {
+                lista.innerHTML = `
+            <div class="pedido-vazio">
+                <div class="vazio-icon">🛒</div>
+                <h3>Seu carrinho está vazio</h3>
+                <p>Que tal adicionar alguns itens deliciosos? 🍔</p>
+                <button class="btn-continuar-comprando" onclick="fecharPedido()">Continuar Comprando</button>
+            </div>
+        `;
+            } else {
+                const subtotal = pedido.reduce((sum, item) => sum + item.preco, 0);
+                const taxaEntrega = tipoEntregaSelecionado === 'entrega' ? 5.00 : 0.00;
+                const totalComEntrega = subtotal + taxaEntrega;
+
+                let itensHTML = '';
+                pedido.forEach((item, index) => {
+                    const nomeBase = item.nome.split(' (')[0];
+                    const personalizacoes = item.nome.includes('(') ? item.nome.split('(')[1].replace(')', '') : '';
+                    const imagemUrl = getImagemPorNome(nomeBase);
+
+                    itensHTML += `
+                <div class="pedido-item-melhorado">
+                    <div class="pedido-item-imagem">
+                        <img src="${imagemUrl}" alt="${nomeBase}">
+                    </div>
+                    <div class="pedido-item-detalhes">
+                        <div class="pedido-item-header">
+                            <h4 class="pedido-item-nome">${nomeBase}</h4>
+                            <span class="pedido-item-preco">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        ${personalizacoes ? `<div class="pedido-personalizacoes">${personalizacoes}</div>` : ''}
+                        <div class="pedido-item-actions">
+                            <button class="btn-remover-item" onclick="removerItemPedido(${index})">
+                                🗑️ Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+                });
+
+                lista.innerHTML = `
+            <div class="pedido-container-melhorado">
+                <!-- Header do Pedido -->
+                <div class="pedido-header-melhorado">
+                    <h2>🛒 Detalhes</h2>
+                    <span class="pedido-quantidade">${pedido.length} ${pedido.length === 1 ? 'item' : 'itens'}</span>
+                </div>
+
+                <!-- Lista de Itens -->
+                <div class="pedido-itens-lista">
+                    ${itensHTML}
+                </div>
+
+                <!-- Resumo do Pedido -->
+                <div class="pedido-resumo">
+                    <h3>📋 Resumo do Pedido</h3>
+                    <div class="resumo-linhas">
+                        <div class="resumo-linha">
+                            <span>Subtotal</span>
+                            <span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="resumo-linha">
+                            <span>Taxa de Entrega</span>
+                            <span>R$ ${taxaEntrega.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div class="resumo-linha total">
+                            <span><strong>Total</strong></span>
+                            <span><strong>R$ ${totalComEntrega.toFixed(2).replace('.', ',')}</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="entrega-opcoes">
+    <div class="entrega-opcao-quadrada ${tipoEntregaSelecionado === 'retirada' ? 'selecionada' : ''}" 
+         onclick="selecionarEntrega('retirada')">
+        <div class="opcao-checkbox">
+            <div class="square-checkmark ${tipoEntregaSelecionado === 'retirada' ? 'selecionado' : ''}"></div>
+        </div>
+        <div class="opcao-info">
+            <strong>Retirada no Local</strong>
+            <span>Venha buscar no restaurante</span>
+            <small>Grátis</small>
+        </div>
+    </div>
+    
+    <div class="entrega-opcao-quadrada ${tipoEntregaSelecionado === 'entrega' ? 'selecionada' : ''}" 
+         onclick="selecionarEntrega('entrega')">
+        <div class="opcao-checkbox">
+            <div class="square-checkmark ${tipoEntregaSelecionado === 'entrega' ? 'selecionado' : ''}"></div>
+        </div>
+        <div class="opcao-info">
+            <strong>Delivery</strong>
+            <span>Entregamos no seu endereço</span>
+            <small>R$ 5,00</small>
+        </div>
+    </div>
+</div>
+                </div>
+
+                <!-- Substituir este bloco dentro do HTML do cardápio público -->
+<!-- Local: dentro da função abrirPedido(), onde tem: -->
+<!-- if (tipoEntregaSelecionado === 'entrega') { ... } -->
+
+${tipoEntregaSelecionado === 'entrega' ? `
+<!-- Formulário de Endereço (apenas para delivery) -->
+<div class="endereco-section">
+    <h3>📍 Endereço de Entrega</h3>
+    
+    <!-- NOVOS CAMPOS ADICIONADOS AQUI -->
+    <div class="dados-cliente-section">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Nome Completo </label>
+                <input type="text" 
+                       placeholder="Ex: João Silva" 
+                       value="${enderecoEntrega.nome || ''}" 
+                       required
+                       oninput="validarNomeCompleto(this)">
+            </div>
+            <div class="form-group">
+                <label>Telefone Celular </label>
+                <input type="text" 
+                       placeholder="Ex: (21) 90000-0000" 
+                       value="${enderecoEntrega.telefone || ''}" 
+                       required 
+                       maxlength="15"
+                       oninput="formatarTelefoneInput(this)">
+            </div>
+        </div>
+    </div>
+    
+    <div class="endereco-form">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>CEP </label>
+                <input type="text" 
+                       placeholder="Ex: 00000-000" 
+                       value="${enderecoEntrega.cep || ''}" 
+                       maxlength="9" 
+                       required
+                       oninput="formatarCEPInput(this)">
+            </div>
+            <div class="form-group">
+                <label>Logradouro </label>
+                <input type="text" 
+                       placeholder="Ex: Nome da rua, avenida etc" 
+                       value="${enderecoEntrega.logradouro || ''}" 
+                       readonly required>
+            </div>
+            <div class="form-group full-width">
+                <label>Complemento (opcional)</label>
+                <input type="text" 
+                       placeholder="Ex: Apartamento, bloco, etc" 
+                       value="${enderecoEntrega.complemento || ''}" 
+                       maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Número </label>
+                <input type="text" 
+                       placeholder="Ex: Número da Residência" 
+                       value="${enderecoEntrega.numero || ''}" 
+                       required 
+                       maxlength="4"
+                       oninput="validarNumeroCasa(this)">
+            </div>
+            <div class="form-group">
+                <label>Bairro </label>
+                <input type="text" 
+                       placeholder="EX: Nome do Bairro" 
+                       value="${enderecoEntrega.bairro || ''}" 
+                       readonly required>
+            </div>
+            <div class="form-group">
+                <label>Cidade </label>
+                <input type="text" 
+                       placeholder="EX: Nome da Cidade" 
+                       value="${enderecoEntrega.cidade || ''}" 
+                       readonly required>
+            </div>
+            <div class="form-group">
+                <label>Estado </label>
+                <input type="text" 
+                       placeholder="EX: UF" 
+                       value="${enderecoEntrega.estado || ''}" 
+                       readonly required>
+            </div>
+        </div>
+    </div>
+</div>
+` : ''}
+
+                <!-- Métodos de Pagamento -->
+<div class="pagamento-section">
+    <h3>💳 Pagamento</h3>
+    <div class="pagamento-opcoes">
+        <div class="pagamento-opcao-quadrada selecionada" onclick="selecionarPagamento('pix')">
+            <div class="opcao-checkbox">
+                <div class="square-checkmark selecionado"></div>
+            </div>
+            <div class="opcao-info">
+                <strong>PIX</strong>
+                <span>Pagamento instantâneo</span>
+                <small>5% de desconto</small>
+            </div>
+            <div class="opcao-icone">📱</div>
+        </div>
+        
+        <div class="pagamento-opcao-quadrada" onclick="selecionarPagamento('credito')">
+            <div class="opcao-checkbox">
+                <div class="square-checkmark"></div>
+            </div>
+            <div class="opcao-info">
+                <strong>Cartão de Crédito</strong>
+                <span>Até 12x sem juros</span>
+                <small>Taxas aplicáveis</small>
+            </div>
+            <div class="opcao-icone">💳</div>
+        </div>
+        
+        <div class="pagamento-opcao-quadrada" onclick="selecionarPagamento('debito')">
+            <div class="opcao-checkbox">
+                <div class="square-checkmark"></div>
+            </div>
+            <div class="opcao-info">
+                <strong>Cartão de Débito</strong>
+                <span>Pagamento à vista</span>
+                <small>Sem taxas</small>
+            </div>
+            <div class="opcao-icone">💳</div>
+        </div>
+        
+        <div class="pagamento-opcao-quadrada" onclick="selecionarPagamento('vale')">
+            <div class="opcao-checkbox">
+                <div class="square-checkmark"></div>
+            </div>
+            <div class="opcao-info">
+                <strong>Vale-Refeição</strong>
+                <span>Aceitamos os principais cartões</span>
+                <small>Sem taxas</small>
+            </div>
+            <div class="opcao-icone">🍽️</div>
+        </div>
+    </div>
+</div>
+
+                <!-- Botão Finalizar -->
+                <div class="pedido-actions">
+                    <button class="btn-continuar-comprando secundario" onclick="fecharPedido()">
+                        ← Continuar Comprando
+                    </button>
+                    <button class="btn-finalizar-pedido" onclick="finalizarPedido()">
+                        Finalizar Pedido 🎉
+                    </button>
+                </div>
+            </div>
+        `;
+
+                // Atualizar os eventos dos inputs de endereço
+                if (tipoEntregaSelecionado === 'entrega') {
+                    const inputs = document.querySelectorAll('.endereco-form input');
+
+                    // CEP - com formatação automática
+                    inputs[0].addEventListener('input', function (e) {
+                        e.target.value = formatarCEP(e.target.value);
+                        enderecoEntrega.cep = e.target.value.replace(/\D/g, '');
+
+                        // Consulta automática quando CEP estiver completo
+                        if (e.target.value.length === 9) {
+                            consultarCEP();
+                        }
+                    });
+
+                    // Número
+                    inputs[1].addEventListener('input', (e) => enderecoEntrega.numero = e.target.value);
+                    // Complemento
+                    inputs[2].addEventListener('input', (e) => enderecoEntrega.complemento = e.target.value);
+
+                    // Campos preenchidos automaticamente (somente leitura)
+                    inputs[3].addEventListener('input', (e) => enderecoEntrega.logradouro = e.target.value);
+                    inputs[4].addEventListener('input', (e) => enderecoEntrega.bairro = e.target.value);
+                    inputs[5].addEventListener('input', (e) => enderecoEntrega.cidade = e.target.value);
+                    inputs[6].addEventListener('input', (e) => enderecoEntrega.estado = e.target.value);
+                } // ← FIM DO IF
+
+            } // ← Este parece ser o fechamento de um bloco maior
+
+            modal.style.display = 'block';
+        }
+
+        function fecharPedido() {
+            document.getElementById('pedido-modal').style.display = 'none';
+        }
+
+
+        // ===== FUNÇÕES DE ENTREGA =====
+function selecionarEntrega(tipo) {
+    tipoEntregaSelecionado = tipo;
+    abrirPedido();
+}
+
+// ===== FUNÇÃO SALVAR ENDEREÇO =====
+function salvarEndereco() {
+    console.log('🔍 Executando salvarEndereco()...');
+    
+    if (tipoEntregaSelecionado !== 'entrega') {
+        console.log('⚠️ Não é delivery, ignorando...');
+        return;
+    }
+    
+    try {
+        // ENCONTRAR OS CAMPOS POR SEUS PLACEHOLDERS ESPECÍFICOS
+        console.log('📋 Buscando campos específicos...');
+        
+        // Mapeamento direto por placeholder
+        const campos = {
+            // Dados do cliente
+            nome: document.querySelector('input[placeholder*="Nome"], input[placeholder*="João"]'),
+            telefone: document.querySelector('input[placeholder*="Telefone"], input[placeholder*="90000"]'),
+            
+            // Endereço
+            cep: document.querySelector('input[placeholder*="CEP"], input[placeholder*="00000"]'),
+            logradouro: document.querySelector('input[placeholder*="Logradouro"], input[placeholder*="rua"], input[placeholder*="endereço"]'),
+            numero: document.querySelector('input[placeholder*="Número"], input[placeholder*="número"]'),
+            complemento: document.querySelector('input[placeholder*="Complemento"]'),
+            bairro: document.querySelector('input[placeholder*="Bairro"]'),
+            cidade: document.querySelector('input[placeholder*="Cidade"]'),
+            estado: document.querySelector('input[placeholder*="Estado"], input[placeholder*="UF"]')
+        };
+        
+        // Se não encontrar por placeholder, tenta por posição no form
+        if (!campos.complemento) {
+            console.log('Complemento não encontrado por placeholder, buscando por posição...');
+            const formInputs = document.querySelectorAll('.endereco-form input, .form-grid input');
+            // Normalmente complemento é o 5º input (índice 4)
+            if (formInputs.length > 4) {
+                campos.complemento = formInputs[4];
+                console.log('Complemento encontrado na posição 4:', campos.complemento);
+            }
+        }
+        
+        // Log de todos os campos encontrados
+        console.log('📊 Campos encontrados:');
+        Object.entries(campos).forEach(([nome, campo]) => {
+            if (campo) {
+                console.log(`✅ ${nome}: "${campo.value}" (placeholder: "${campo.placeholder}")`);
+            } else {
+                console.log(`❌ ${nome}: NÃO ENCONTRADO`);
+            }
+        });
+        
+        // Salvar valores
+        enderecoEntrega = {
+            nome: campos.nome ? campos.nome.value.trim() : '',
+            telefone: campos.telefone ? campos.telefone.value.trim() : '',
+            cep: campos.cep ? campos.cep.value.trim() : '',
+            logradouro: campos.logradouro ? campos.logradouro.value.trim() : '',
+            numero: campos.numero ? campos.numero.value.trim() : '',
+            complemento: campos.complemento ? campos.complemento.value.trim() : '', // ← AQUI!
+            bairro: campos.bairro ? campos.bairro.value.trim() : '',
+            cidade: campos.cidade ? campos.cidade.value.trim() : '',
+            estado: campos.estado ? campos.estado.value.trim() : ''
+        };
+        
+        console.log('✅ Endereço salvo:', enderecoEntrega);
+        
+    } catch (error) {
+        console.error('❌ Erro em salvarEndereco():', error);
+        if (!enderecoEntrega) enderecoEntrega = {};
+    }
+}
+
+        // ===== FUNÇÃO PARA SELECIONAR PAGAMENTO =====
+        function selecionarPagamento(metodo) {
+            console.log("Selecionando método de pagamento:", metodo);
+
+            // Remove a seleção visual de todas as opções
+            const todasOpcoes = document.querySelectorAll('.pagamento-opcao-quadrada');
+            todasOpcoes.forEach(opcao => {
+                opcao.classList.remove('selecionada');
+            });
+
+            // Remove a seleção de todas as caixinhas
+            const todasCaixinhas = document.querySelectorAll('.pagamento-section .square-checkmark');
+            todasCaixinhas.forEach(caixinha => {
+                caixinha.classList.remove('selecionado');
+            });
+
+            // Adiciona seleção visual na opção clicada
+            const opcaoClicada = event.currentTarget;
+            opcaoClicada.classList.add('selecionada');
+
+            // Adiciona seleção na caixinha da opção clicada
+            const caixinhaClicada = opcaoClicada.querySelector('.square-checkmark');
+            caixinhaClicada.classList.add('selecionado');
+
+            // Salva o método selecionado globalmente
+            window.metodoPagamentoSelecionado = metodo;
+
+            console.log("Método de pagamento selecionado:", metodo);
+
+            // Feedback visual
+            showNotification(`Pagamento via ${getNomePagamento(metodo)} selecionado!`, 'success');
+        }
+
+        // Função auxiliar para obter nome do pagamento
+        function getNomePagamento(metodo) {
+            const nomes = {
+                'pix': 'PIX',
+                'credito': 'Cartão de Crédito',
+                'debito': 'Cartão de Débito',
+                'vale': 'Vale-Refeição'
+            };
+            return nomes[metodo] || metodo;
+        }
+
+// ===== FINALIZAR PEDIDO =====
+async function finalizarPedido() {
+    try {
+        console.log('Iniciando finalizarPedido...'); // Debug
+        
+        if (pedido.length === 0) {
+            showNotification('Adicione itens ao pedido antes de finalizar!', 'error');
+            return;
+        }
+
+        // Validação para entrega
+        if (tipoEntregaSelecionado === 'entrega') {
+            salvarEndereco();
+            
+            if (!enderecoEntrega.nome || !enderecoEntrega.telefone) {
+                showNotification('Preencha seu nome e telefone para entrega!', 'error');
+                return;
+            }
+            
+            if (!enderecoEntrega.logradouro || !enderecoEntrega.numero || !enderecoEntrega.bairro) {
+                showNotification('Preencha todos os campos do endereço para entrega!', 'error');
+                return;
+            }
+        }
+
+        // Preparar dados
+        const dadosPedido = {
+            itens: pedido.map(item => ({
+                nome_completo: item.nome,
+                nome_base: item.nome.split(' (')[0],
+                preco: item.preco
+            })),
+            cliente: {
+                nome: enderecoEntrega.nome || 'Cliente',
+                telefone: enderecoEntrega.telefone || ''
+            },
+            endereco: tipoEntregaSelecionado === 'entrega' ? enderecoEntrega : {},
+            tipo_entrega: tipoEntregaSelecionado,
+            forma_pagamento: window.metodoPagamentoSelecionado || 'pix',
+            total: total + (tipoEntregaSelecionado === 'entrega' ? 5.00 : 0),
+            observacoes: document.getElementById('observacoes-pedido') ? 
+                         document.getElementById('observacoes-pedido').value : '',
+            troco_para: 0
+        };
+
+        console.log('Dados do pedido:', dadosPedido); // Debug
+        
+        showNotification('Processando pedido...', 'info');
+        
+        // AQUI ESTÁ O AWAIT (correto, dentro de async function)
+        const response = await fetch('salvar_pedido.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dadosPedido)
+        });
+        
+        const resultado = await response.json();
+        console.log('Resposta do servidor:', resultado); // Debug
+        
+        if (resultado.sucesso) {
+            // Exibir mensagem de sucesso mais destacada
+            const numeroPedido = resultado.numero_pedido || 'XXX';
+            
+            // Fechar modal primeiro
+            fecharPedido();
+            
+            // Mensagem em modal dedicado
+            setTimeout(() => {
+                exibirMensagemFinalizacao(numeroPedido);
+            }, 300);
+            
+            // Também mostrar notificação
+            showNotification(`🎉 Pedido #${numeroPedido} finalizado com sucesso!`, 'success');
+            
+            // Limpar tudo
+            pedido = []; 
+            total = 0; 
+            tipoEntregaSelecionado = 'retirada';
+            enderecoEntrega = {};
+            window.metodoPagamentoSelecionado = null;
+            
+            if (document.getElementById('observacoes-pedido')) {
+                document.getElementById('observacoes-pedido').value = '';
+            }
+            
+            atualizarBarra();
+            
+        } else {
+            throw new Error(resultado.error || 'Erro ao processar pedido');
+        }
+        
+    } catch (error) {
+        console.error('Erro em finalizarPedido:', error);
+        showNotification('Erro: ' + error.message, 'error');
+    }
+}
+
+// ===== MENSAGEM DE FINALIZAÇÃO =====
+function exibirMensagemFinalizacao(numeroPedido) {
+    // Verificar se já existe um modal e remover
+    const modalExistente = document.getElementById('confirmacao-modal');
+    if (modalExistente) {
+        modalExistente.remove();
+    }
+    
+    // Criar modal de confirmação
+    const modalHTML = `
+        <div id="confirmacao-modal" class="modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+            padding: 20px 0;
+        ">
+            <div class="modal-content" style="
+                background: linear-gradient(145deg, #ffffff, #f8f9fa);
+                max-width: 500px;
+                width: 90%;
+                border-radius: 20px;
+                padding: 0;
+                overflow: visible;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+                animation: slideUp 0.5s ease-out;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                margin: 20px auto;
+            ">
+                <!-- BOTÃO FECHAR NO CANTO SUPERIOR DIREITO -->
+                <button onclick="fecharConfirmacao()" 
+                        style="
+                            position: absolute;
+                            top: 15px;
+                            right: 15px;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            background: rgba(255, 255, 255, 0.9);
+                            border: 2px solid #FF6B35;
+                            color: #FF6B35;
+                            font-size: 24px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.3s ease;
+                            z-index: 1000;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        "
+                        onmouseover="this.style.background='#FF6B35'; this.style.color='white'; this.style.transform='rotate(90deg) scale(1.1)';"
+                        onmouseout="this.style.background='rgba(255, 255, 255, 0.9)'; this.style.color='#FF6B35'; this.style.transform='rotate(0) scale(1)';"
+                        title="Fechar (ESC)">
+                    ×
+                </button>
+                
+                <!-- Cabeçalho com gradiente -->
+                <div style="
+                    background: linear-gradient(135deg, #FF6B35, #FF8E53);
+                    padding: 40px 30px;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <!-- Efeito de confetes -->
+                    <div style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 2px, transparent 2px);
+                        background-size: 40px 40px;
+                        opacity: 0.3;
+                    "></div>
+                    
+                    <!-- Ícone animado -->
+                    <div style="
+                        font-size: 80px;
+                        margin-bottom: 15px;
+                        animation: bounce 1s ease infinite;
+                        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+                    ">🎉</div>
+                    
+                    <!-- Título principal -->
+                    <h2 style="
+                        color: white;
+                        margin: 0;
+                        font-size: 32px;
+                        font-weight: 800;
+                        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                        letter-spacing: 0.5px;
+                    ">PEDIDO CONFIRMADO!</h2>
+                    
+                    <!-- Número do pedido -->
+                    <div style="
+                        background: rgba(255, 255, 255, 0.2);
+                        display: inline-block;
+                        padding: 8px 20px;
+                        border-radius: 30px;
+                        margin-top: 15px;
+                        color: white;
+                        font-weight: 600;
+                        font-size: 18px;
+                        backdrop-filter: blur(5px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                    ">#${numeroPedido}</div>
+                </div>
+                
+                <!-- Corpo da mensagem -->
+                <div style="padding: 40px 30px;">
+                    <!-- Mensagem principal -->
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        background: #E8F5E9;
+                        padding: 20px;
+                        border-radius: 12px;
+                        margin-bottom: 30px;
+                        border-left: 5px solid #4CAF50;
+                    ">
+                        <div style="
+                            background: #4CAF50;
+                            color: white;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 24px;
+                            margin-right: 15px;
+                            flex-shrink: 0;
+                        ">✓</div>
+                        <div>
+                            <h3 style="
+                                margin: 0 0 5px 0;
+                                color: #2E7D32;
+                                font-size: 18px;
+                            ">Tudo certo! 🚀</h3>
+                            <p style="
+                                margin: 0;
+                                color: #388E3C;
+                                font-size: 15px;
+                                line-height: 1.5;
+                            ">Seu pedido foi registrado e já está sendo preparado com carinho!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Detalhes do pedido -->
+                    <div style="
+                        background: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+                        border: 1px solid #f0f0f0;
+                    ">
+                        <h4 style="
+                            margin: 0 0 20px 0;
+                            color: #333;
+                            font-size: 18px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        ">
+                            <span style="
+                                background: #2196F3;
+                                color: white;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 14px;
+                            ">📋</span>
+                            Detalhes do Pedido
+                        </h4>
+                        
+                        <div style="display: grid; gap: 15px;">
+                            <div style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding-bottom: 12px;
+                                border-bottom: 1px solid #f5f5f5;
+                            ">
+                                <span style="color: #666; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 18px;">⏱️</span> Tempo Estimado
+                                </span>
+                                <span style="
+                                    font-weight: 600;
+                                    color: #FF6B35;
+                                    background: #FFF3E0;
+                                    padding: 6px 12px;
+                                    border-radius: 6px;
+                                    font-size: 14px;
+                                ">30-45 minutos</span>
+                            </div>
+                            
+                            <div style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding-bottom: 12px;
+                                border-bottom: 1px solid #f5f5f5;
+                            ">
+                                <span style="color: #666; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 18px;">📦</span> Entrega
+                                </span>
+                                <span style="font-weight: 600; color: #333;">
+                                    ${window.tipoEntregaSelecionado === 'entrega' ? '🚚 Delivery' : '🏪 Retirada'}
+                                </span>
+                            </div>
+                            
+                            <div style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            ">
+                                <span style="color: #666; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 18px;">🔔</span> Status
+                                </span>
+                                <span style="
+                                    font-weight: 600;
+                                    background: #FFF3CD;
+                                    color: #856404;
+                                    padding: 6px 15px;
+                                    border-radius: 20px;
+                                    font-size: 13px;
+                                    border: 1px solid #FFEAA7;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                ">Em preparação</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Aviso -->
+                    <div style="
+                        background: #E3F2FD;
+                        border-radius: 12px;
+                        padding: 15px;
+                        text-align: left;
+                        margin-bottom: 25px;
+                        border: 1px solid #BBDEFB;
+                    ">
+                        <div style="
+                            display: flex;
+                            align-items: flex-start;
+                            gap: 12px;
+                        ">
+                            <div style="
+                                color: #1976D2;
+                                font-size: 20px;
+                                flex-shrink: 0;
+                            ">💡</div>
+                            <div>
+                                <p style="
+                                    margin: 0;
+                                    color: #0D47A1;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                ">
+                                    <strong>Importante:</strong> Você receberá atualizações do pedido por WhatsApp. 
+                                    Fique de olho no seu celular!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rodapé com botões -->
+                <div style="
+                    padding: 25px 30px;
+                    background: linear-gradient(to top, #f8f9fa, #ffffff);
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                ">
+                    <!-- Botão principal -->
+                    <button onclick="fecharConfirmacao()" style="
+                        background: linear-gradient(135deg, #FF6B35, #FF8E53);
+                        color: white;
+                        border: none;
+                        padding: 18px;
+                        border-radius: 12px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        letter-spacing: 0.5px;
+                        box-shadow: 0 6px 15px rgba(255, 107, 53, 0.4);
+                    "
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(255, 107, 53, 0.6)';"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(255, 107, 53, 0.4)';">
+                        <span style="font-size: 20px;">🍔</span>
+                        Fazer Novo Pedido
+                    </button>
+                    
+                    <!-- Botões secundários -->
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="imprimirComprovante('${numeroPedido}')" style="
+                            flex: 1;
+                            background: white;
+                            color: #333;
+                            border: 2px solid #FF6B35;
+                            padding: 15px;
+                            border-radius: 10px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                        "
+                        onmouseover="this.style.background='#FFF5F0'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.background='white'; this.style.transform='translateY(0)';">
+                            <span style="font-size: 18px;">🖨️</span>
+                            Comprovante
+                        </button>
+                        
+                        <button onclick="window.location.reload()" style="
+                            flex: 1;
+                            background: white;
+                            color: #333;
+                            border: 2px solid #2196F3;
+                            padding: 15px;
+                            border-radius: 10px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                        "
+                        onmouseover="this.style.background='#E3F2FD'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.background='white'; this.style.transform='translateY(0)';">
+                            <span style="font-size: 18px;">🔄</span>
+                            Recarregar
+                        </button>
+                    </div>
+                    
+                    <!-- Botão Fechar adicional -->
+                    <button onclick="fecharConfirmacao()" style="
+                        background: #f5f5f5;
+                        color: #666;
+                        border: 1px solid #ddd;
+                        padding: 14px;
+                        border-radius: 10px;
+                        font-size: 15px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 5px;
+                    "
+                    onmouseover="this.style.background='#FFEBEE'; this.style.color='#D32F2F'; this.style.borderColor='#D32F2F'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.background='#f5f5f5'; this.style.color='#666'; this.style.borderColor='#ddd'; this.style.transform='translateY(0)';">
+                        <span style="font-size: 18px;">❌</span>
+                        Fechar
+                    </button>
+                    
+                    <!-- Link para WhatsApp -->
+                    <div style="text-align: center; margin-top: 10px;">
+                        <a href="https://wa.me/5521900000000?text=Olá!%20Gostaria%20de%20saber%20sobre%20o%20pedido%20${numeroPedido}" 
+                           target="_blank"
+                           style="
+                                color: #666;
+                                text-decoration: none;
+                                font-size: 14px;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 8px;
+                                padding: 10px;
+                                border-radius: 8px;
+                                transition: all 0.3s ease;
+                           "
+                           onmouseover="this.style.color='#25D366'; this.style.background='#f5f5f5';">
+                            <span style="font-size: 18px;">💬</span>
+                            Falar com atendente no WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estilos de animação -->
+        <style id="animacao-confirmacao">
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes slideUp {
+                from { 
+                    transform: translateY(50px) scale(0.95);
+                    opacity: 0;
+                }
+                to { 
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            /* Estilo para custom scrollbar */
+            #confirmacao-modal::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            #confirmacao-modal::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+            }
+            
+            #confirmacao-modal::-webkit-scrollbar-thumb {
+                background: #FF6B35;
+                border-radius: 10px;
+            }
+            
+            #confirmacao-modal::-webkit-scrollbar-thumb:hover {
+                background: #FF8E53;
+            }
+        </style>
+    `;
+    
+    // Criar um container temporário
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = modalHTML;
+    
+    // Apenas adicionar o modal ao body, sem substituir
+    const modalElement = tempDiv.firstElementChild;
+    document.body.appendChild(modalElement);
+    
+    // Mostrar modal com animação
+    setTimeout(() => {
+        const modal = document.getElementById('confirmacao-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            
+            // Adicionar efeito de confetes de forma segura
+            criarConfetes();
+            
+            // Configurar tecla ESC
+            const escHandler = function(e) {
+                if (e.key === 'Escape') {
+                    fecharConfirmacao();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+    }, 50);
+}
+
+// Função para criar efeito de confetes de forma segura
+function criarConfetes() {
+    const cores = ['#FF6B35', '#FF8E53', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
+    
+    for (let i = 0; i < 30; i++) { // Reduzido para 30 confetes
+        const confete = document.createElement('div');
+        confete.style.cssText = `
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: ${cores[Math.floor(Math.random() * cores.length)]};
+            border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+            top: -20px;
+            left: ${Math.random() * 100}%;
+            animation: confeteFall ${1 + Math.random() * 2}s linear forwards;
+            z-index: 99998;
+            opacity: 0.8;
+            pointer-events: none;
+        `;
+        
+        document.body.appendChild(confete);
+        
+        // Remover após animação
+        setTimeout(() => {
+            if (confete.parentNode) {
+                confete.remove();
+            }
+        }, 3000);
+    }
+    
+    // Adicionar animação de confetes uma vez só
+    if (!document.querySelector('#confete-animation')) {
+        const style = document.createElement('style');
+        style.id = 'confete-animation';
+        style.textContent = `
+            @keyframes confeteFall {
+                to {
+                    transform: translateY(100vh) rotate(${Math.random() * 360}deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function fecharConfirmacao() {
+    const modal = document.getElementById('confirmacao-modal');
+    if (modal) {
+        // Animação de saída
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        modal.style.transition = 'all 0.3s ease';
+        
+        setTimeout(() => {
+            if (modal && modal.parentNode) {
+                modal.style.display = 'none';
+                modal.remove();
+            }
+            
+            // Limpar e resetar
+            pedido = [];
+            total = 0;
+            atualizarBarra();
+            
+            // Remover estilos de animação se existirem
+            const animacaoStyle = document.getElementById('animacao-confirmacao');
+            if (animacaoStyle) {
+                animacaoStyle.remove();
+            }
+        }, 300);
+    }
+}
+
+// Função para imprimir comprovante (CORRIGIDA com window.tipoEntregaSelecionado)
+function imprimirComprovante(numeroPedido) {
+    const conteudo = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 20px;
+                    max-width: 400px;
+                    margin: 0 auto;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .title {
+                    color: #FF6B35;
+                    margin: 0;
+                    font-size: 28px;
+                }
+                .subtitle {
+                    color: #666;
+                    margin: 5px 0;
+                }
+                .content {
+                    border: 2px dashed #ddd;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                }
+                .order-number {
+                    font-size: 24px;
+                    color: #FF6B35;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+                .info-box {
+                    background: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                }
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                }
+                .footer {
+                    text-align: center;
+                    color: #999;
+                    font-size: 12px;
+                    border-top: 1px solid #eee;
+                    padding-top: 15px;
+                }
+                @media print {
+                    body { padding: 0; }
+                    button { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1 class="title">🍔 Na Chapa</h1>
+                <p class="subtitle">Comprovante de Pedido</p>
+            </div>
+            
+            <div class="content">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div class="order-number">PEDIDO #${numeroPedido}</div>
+                    <div style="font-size: 14px; color: #888;">
+                        ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-row">
+                        <span>Status:</span>
+                        <span style="color: #FF9800; font-weight: bold;">EM PREPARAÇÃO</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Tipo:</span>
+                        <span>${window.tipoEntregaSelecionado === 'entrega' ? 'DELIVERY' : 'RETIRADA'}</span>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; color: #666; font-size: 14px; padding: 10px;">
+                    Obrigado por escolher o Na Chapa!<br>
+                    Seu pedido está sendo preparado com ingredientes frescos.
+                </div>
+            </div>
+            
+            <div class="footer">
+                Na Chapa © ${new Date().getFullYear()} | WhatsApp: (21) 90000-0000
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="
+                    background: #FF6B35;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                ">🖨️ Imprimir Comprovante</button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const janela = window.open('', '_blank', 'width=600,height=700');
+    janela.document.write(conteudo);
+    janela.document.close();
+    janela.focus();
+}
+
+// Fechar modal ao clicar fora (usando event delegation)
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('confirmacao-modal');
+    if (modal && event.target === modal) {
+        fecharConfirmacao();
+    }
+});
+
+// ===== REMOVER ITEM DO PEDIDO =====
+function removerItemPedido(index) {
+    if (index >= 0 && index < pedido.length) {
+        const itemRemovido = pedido.splice(index, 1)[0];
+        total -= itemRemovido.preco;
+        atualizarBarra();
+        abrirPedido();
+        showNotification(itemRemovido.nome.split(' (')[0] + ' removido do pedido', 'info');
+    }
+}
+// ===== NOTIFICAÇÕES =====
+function showNotification(message, type) {
+    if (!type) type = 'info';
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.className = 'notification ' + type;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(function () { notification.classList.add('show'); }, 10);
+    setTimeout(function () {
+        notification.classList.remove('show');
+        setTimeout(function () { notification.remove(); }, 300);
+    }, 3000);
+}
+
+// ===== FUNÇÃO AUXILIAR PARA IMAGENS =====
+function getImagemPorNome(nome) {
+    const imagens = {
+        'Classic Burger': 'imagens/Hambúrguer_Clássico.avif',
+        'Bacon Master': 'imagens/hambúrguer_Bacon.jpg',
+        'Double Cheese': 'imagens/Hambúrguer_Queijo_Duplo.avif',
+        'Spicy Burger': 'imagens/hambúrguer_picante.jpg',
+        'Veggie Burger': 'imagens/hambúrguer_vegano.jpg',
+        'BurgerMaster Supreme': 'imagens/Mestre_Supremo.avif',
+        'Batata Frita': 'imagens/batata_frita.jpg',
+        'Onion Rings': 'imagens/aneis_cebola.webp',
+        'Bacon Crocante': 'imagens/bacon_crocante.jpg',
+        'Refrigerante': 'imagens/refrigerante.avif',
+        'Cerveja': 'imagens/cerveja.avif',
+        'Suco Natural': 'imagens/suco_natural.avif',
+        'Água': 'imagens/Agua.webp',
+        'Milkshake': 'imagens/milkshake.avif',
+        'Brownie': 'imagens/brownie.avif',
+        'Cheesecake': 'imagens/cheesecake.avif'
+    };
+    return imagens[nome] || 'imagens/Hambúrguer_Clássico.avif';
+}
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', function () {
+            atualizarBarra();
+        });
+
+        window.onclick = function (event) {
+            const pedidoModal = document.getElementById('pedido-modal');
+            if (event.target === productModal) {
+                closeProductModal();
+            }
+            if (event.target === pedidoModal) {
+                fecharPedido();
+            }
+        }
+
+        // ===== SISTEMA DO ATENDENTE IA =====
+        let isAssistantOpen = false;
+        const assistantModal = document.getElementById('assistant-modal');
+        const chatMessages = document.getElementById('chat-messages');
+        const accessibilityBar = document.querySelector('.accessibility-bar'); // Referência ao leitor de voz
+
+        function toggleAssistant() {
+            isAssistantOpen = !isAssistantOpen;
+
+            if (isAssistantOpen) {
+                assistantModal.style.display = 'flex';
+                // Esconde o leitor de voz quando o assistente abre
+                accessibilityBar.classList.add('hidden');
+
+                // Mostra mensagem de boas-vindas apenas se for a primeira vez
+                if (chatMessages.children.length === 0) {
+                    showWelcomeMessage();
+                }
+                // Foca no input
+                document.getElementById('chat-input').focus();
+            } else {
+                assistantModal.style.display = 'none';
+                // Mostra o leitor de voz novamente quando o assistente fecha
+                accessibilityBar.classList.remove('hidden');
+            }
+        }
+
+        function closeAssistant() {
+            isAssistantOpen = false;
+            assistantModal.style.display = 'none';
+        }
+
+        function showWelcomeMessage() {
+            const welcomeMsg = `
+                <div class="message bot-message">
+                    <strong>🤖 Atendente Na Chapa:</strong><br>
+                    Olá, seja bem-vindo(a) ao Na Chapa! 🍔<br><br>
+                    • ⏰ Horários de Trabalho;<br>
+                    • 📍 Nosso Endereço;<br>
+                    • 🍔 Cardápio (resumido);<br>
+                    • 💰 Promoções da Semana;<br>
+                    • 🚚 Entrega (delivery);<br>
+                    • 📞 Dúvidas (Contatos);<br><br>
+                    <strong>Como posso ajudar você hoje?</strong>
+                </div>
+            `;
+            chatMessages.innerHTML = welcomeMsg;
+        }
+
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function askQuestion(question) {
+            document.getElementById('chat-input').value = question;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (message === '') return;
+
+            // Adiciona mensagem do usuário
+            addUserMessage(message);
+
+            // Limpa input
+            input.value = '';
+
+            // Simula digitação
+            showTypingIndicator();
+
+            // Resposta do bot após delay
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = generateBotResponse(message);
+                addBotMessage(response);
+            }, 1500);
+        }
+
+        function addUserMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.innerHTML = `<strong>👤 Você:</strong><br>${message}`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+
+            // NOVO: Scroll para o TOPO da resposta (início)
+            scrollToMessageTop(messageDiv);
+        }
+
+        // ===== SCROLL PARA O TOPO DA MENSAGEM =====
+        function scrollToMessageTop(messageElement) {
+            setTimeout(() => {
+                if (messageElement && chatMessages) {
+                    // Calcula a posição relativa da mensagem dentro do container
+                    const messageOffset = messageElement.offsetTop - chatMessages.offsetTop;
+
+                    // Scroll para o topo da mensagem (início da resposta)
+                    chatMessages.scrollTop = messageOffset - 10; // -10px para dar uma margem
+                }
+            }, 50); // Pequeno delay para garantir que a mensagem foi renderizada
+        }
+
+        function addBotMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.innerHTML = `<strong>🤖 Atendente:</strong><br>${message}`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+
+            // NOVA LINHA ADICIONADA: Scroll para o início da resposta
+            scrollParaInicioResposta();
+        }
+
+        // ===== FUNÇÃO PARA SCROLL PARA O INÍCIO DA RESPOSTA =====
+        function scrollParaInicioResposta() {
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chat-messages');
+                if (chatMessages && chatMessages.lastElementChild) {
+                    // Encontra a última mensagem do bot
+                    const mensagens = chatMessages.querySelectorAll('.bot-message');
+                    if (mensagens.length > 0) {
+                        const ultimaResposta = mensagens[mensagens.length - 1];
+                        // Scroll para o topo da última resposta
+                        const posicaoTopo = ultimaResposta.offsetTop - chatMessages.offsetTop - 10;
+                        chatMessages.scrollTop = posicaoTopo;
+                    }
+                }
+            }, 100);
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) {
+                typing.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateBotResponse(userMessage) {
+            const msg = userMessage.toLowerCase();
+
+            // RESPOSTAS PRÉ-DEFINIDAS (MANTIDAS EXATAMENTE COMO ESTÃO)
+            if (msg.includes('horário') || msg.includes('funcionamento') || msg.includes('aberto') || msg.includes('fecha')) {
+                return `🕒 HORÁRIOS DE FUNCIONAMENTO<br><br><br>
+                📅 <strong>Segunda à Sábado:</strong><br>18h - 23h<br><br>
+                📅 <strong>Domingo:</strong><br>18h - 22h<br><br>
+                <strong>Estamos abertos agora!<strong> 🍔`;
+
+            } else if (msg.includes('endereço') || msg.includes('local') || msg.includes('onde') || msg.includes('fica')) {
+                return `📍 ENDEREÇO<br><br><br>
+                <strong>Local:</strong> SENAI, Caxias<br>
+                Rua Arthur - Travessa Goulart, 124 - Centro, Duque de Caxias - RJ, 25070-020<br><br>
+                <strong>Venha nos visitar!</strong> 🛵`;
+
+            } else if (msg.includes('cardápio') || msg.includes('hambúrguer') || msg.includes('menu') || msg.includes('opção')) {
+                return `🍔 CARDÁPIO<br><br><br>
+    <strong>Hambúrgueres:</strong><br><br>
+    • Hambúrger Clássico<br>(R$ 18,90)<br><br>
+    • Hambúrguer Recheado de Bacon (R$ 22,50)<br><br>
+    • Hambúrguer com Queijo Duplo (R$ 24,90)<br><br>
+    • Hambúrguer Picante<br>(R$ 21,90)<br><br>
+    • Hambúrguer Vegano<br>(R$ 19,90)<br><br>
+    • Hambúrguer Mestre Supremo (R$ 28,90)<br><br><br>
+    <strong>Acompanhamentos:</strong><br><br>
+    • Batata Frita (R$ 12,90)<br><br>
+    • Anéis de Cebola (R$ 14,90)<br><br>
+    • Bacon Crocante (R$ 16,90)<br><br><br>
+    <strong>Bebidas:</strong><br><br>
+    • Refrigerante (R$ 6,90)<br><br>
+    • Cerveja (R$ 9,90)<br><br>
+    • Suco Natural (R$ 10,90)<br><br>
+    • Água (R$ 4,90)<br><br><br>
+    <strong>Sobremesas:</strong><br><br>
+    • Milkshake (R$ 15,90)<br><br>
+    • Brownie (R$ 13,90)<br><br>
+    • Cheesecake (R$ 14,90)<br><br><br>
+    <strong>Bom apetite!</strong> 😁`;
+
+            } else if (msg.includes('delivery') || msg.includes('entrega') || msg.includes('leva') || msg.includes('casa')) {
+                return `🚚 ENTREGA (DELIVERY)<br><br><br>
+                ✅ <strong>Fazemos entrega!</strong><br><br>
+                💰 <strong>Taxa:</strong> R$ 5,00<br><br>
+                ⏱️ <strong>Tempo:</strong> 30-45 min<br><br><br>
+                <strong>Peça pelo site mesmo!</strong> 👍`;
+
+            } else if (msg.includes('promoção') || msg.includes('desconto') || msg.includes('oferta') || msg.includes('promo')) {
+                return `🎉 PROMOÇÕES<br><br><br>
+                🔥 <strong>Quarta do Duplo:</strong> leve 2 hambúrgueres e pague 1!<br><br>
+                👨‍👩‍👧‍👦 <strong>Sábado em Família:</strong><br> -20% ao comprar combos familiares!<br><br>
+                📱 <strong>Primeiro Pedido:</strong><br> -15% no seu primeiro pedido pelo site!<br><br>
+                <strong>Aproveite! 🚀</strong>`;
+
+            } else if (msg.includes('contato') || msg.includes('telefone') || msg.includes('whatsapp') || msg.includes('email')) {
+                return `📞 CONTATO<br><br><br>
+                📱 <strong>Telefone (Fixo):</strong><br> (21) 0000-0000<br><br>
+                🟢 <strong>WhatsApp:</strong><br> (21) 90000-0000<br><br>
+                📧 <strong>Email:</strong> joni.rj@hotmail.com<br><br>
+                <strong>Estamos aqui para te atender! 😊</strong>`;
+
+            } else if (msg.includes('obrigado') || msg.includes('obrigada') || msg.includes('valeu') || msg.includes('agradeço')) {
+                return `😊 DE NADA!<br><br>
+                Fico feliz em ajudar, pode perguntar em caso de dúvidas.<br><br>
+                <strong>Volte sempre ao Na Chapa! 🍔</strong>`;
+
+            } else {
+                return `🤔 DESCULPE, MAS EU NÃO ENTENDI!<br><br>
+                <strong>Posso ajudar você com:</strong><br>
+                • ⏰ Horários de Trabalho;<br>
+                • 📍 Nosso Endereço;<br>
+                • 🍔 Cardápio (resumido);<br>
+                • 💰 Promoções da Semana;<br>
+                • 🚚 Entrega (delivery);<br>
+                • 📞 Dúvidas (contatos);<br><br>
+                <strong>Pode reformular sua pergunta ?</strong>`;
+            }
+        }
+
+        // ===== ATUALIZAR DESTAQUES DO CARROSSEL COM DADOS DO BANCO =====
+function atualizarDestaquesCarrossel() {
+    if (!cardapioData || Object.keys(cardapioData).length === 0) return;
+    
+    // Selecionar destaques automaticamente
+    window.destaques = selecionarDestaquesAutomaticamente();
+    
+    // Re-inicializar o carrossel com os novos dados
+    if (window.destaques && window.destaques.length > 0) {
+        inicializarCarrossel();
+    }
+}
+
+// ===== SELECIONAR DESTAQUES AUTOMATICAMENTE =====
+function selecionarDestaquesAutomaticamente() {
+    const destaquesSelecionados = [];
+    
+    // Lógica para selecionar itens em destaque
+    // 1. Pega os mais caros de cada categoria (carros-chefes)
+    const categoriasParaDestaque = ['hamburgueres', 'sobremesas'];
+    
+    categoriasParaDestaque.forEach(categoria => {
+        if (cardapioData[categoria] && cardapioData[categoria].length > 0) {
+            // Ordena por preço (do maior para o menor)
+            const itensOrdenados = [...cardapioData[categoria]].sort((a, b) => b.preco - a.preco);
+            
+            // Pega o mais caro de cada categoria
+            const destaque = itensOrdenados[0];
+            if (destaque) {
+                destaquesSelecionados.push({
+                    ...destaque,
+                    // Garante que tem a descrição completa
+                    descricao: destaque.descricao || `Nosso ${categoria.slice(0, -1)} premium!`
+                });
+            }
+        }
+    });
+    
+    // 2. Se não tiver 4 itens, complementa com outros aleatórios
+    if (destaquesSelecionados.length < 4) {
+        const todosItens = [];
+        for (const categoria in cardapioData) {
+            if (cardapioData[categoria]) {
+                todosItens.push(...cardapioData[categoria]);
+            }
+        }
+        
+        // Remove itens já selecionados
+        const itensDisponiveis = todosItens.filter(item => 
+            !destaquesSelecionados.some(d => d.id === item.id)
+        );
+        
+        // Seleciona aleatoriamente até completar 4
+        while (destaquesSelecionados.length < 4 && itensDisponiveis.length > 0) {
+            const randomIndex = Math.floor(Math.random() * itensDisponiveis.length);
+            const itemAleatorio = itensDisponiveis[randomIndex];
+            
+            destaquesSelecionados.push({
+                ...itemAleatorio,
+                descricao: itemAleatorio.descricao || `Uma excelente opção de ${itemAleatorio.categoria}!`
+            });
+            
+            itensDisponiveis.splice(randomIndex, 1);
+        }
+    }
+    
+    return destaquesSelecionados.slice(0, 4); // Máximo 4 itens
+}
+
+       // Inicializar carrossel
+function inicializarCarrossel() {
+    const track = document.getElementById('carrossel-track');
+    const indicadores = document.getElementById('carrossel-indicadores');
+
+    // Limpar conteúdo existente
+    track.innerHTML = '';
+    indicadores.innerHTML = '';
+
+    // Verificar se há destaques
+    if (!window.destaques || window.destaques.length === 0) {
+        track.innerHTML = '<div class="carrossel-vazio">Carregando destaques...</div>';
+        return;
+    }
+
+    // Adicionar itens ao carrossel
+    window.destaques.forEach((destaque, index) => {
+        const item = document.createElement('div');
+        item.className = 'carrossel-item';
+        
+        // Converter preço para número
+        const preco = typeof destaque.preco === 'string' ? 
+                      parseFloat(destaque.preco.replace(',', '.')) : 
+                      Number(destaque.preco);
+        
+        item.innerHTML = `
+            <div class="carrossel-item-content">
+                <h3>${destaque.nome}</h3>
+                <p class="descricao">${destaque.descricao}</p>
+                <div class="carrossel-preco">R$ ${preco.toFixed(2).replace('.', ',')}</div>
+                <button class="btn-carrossel" onclick="destaqueParaPedido(${index})">
+                    <span class="btn-icon">➕</span>Adicionar ao Pedido
+                </button>
+            </div>
+            <div class="carrossel-imagem">
+                <img src="${destaque.imagem || getImagemPadrao(destaque.nome, destaque.categoria)}" 
+                     alt="${destaque.nome}"
+                     onerror="this.onerror=null; this.src='imagens/Hambúrguer_Clássico.avif';">
+            </div>
+        `;
+        track.appendChild(item);
+
+        // Adicionar indicador
+        const indicador = document.createElement('div');
+        indicador.className = `carrossel-indicador ${index === 0 ? 'ativo' : ''}`;
+        indicador.onclick = () => irParaSlide(index);
+        indicadores.appendChild(indicador);
+    });
+
+    // Iniciar autoplay
+    iniciarAutoplay();
+}
+
+        // Mover carrossel
+        function moverCarrossel(direcao) {
+            const totalSlides = destaques.length;
+            carrosselIndex = (carrosselIndex + direcao + totalSlides) % totalSlides;
+            atualizarCarrossel();
+            reiniciarAutoplay();
+        }
+
+        // Ir para slide específico
+        function irParaSlide(index) {
+            carrosselIndex = index;
+            atualizarCarrossel();
+            reiniciarAutoplay();
+        }
+
+        // Atualizar posição do carrossel
+        function atualizarCarrossel() {
+            const track = document.getElementById('carrossel-track');
+            const indicadores = document.querySelectorAll('.carrossel-indicador');
+
+            track.style.transform = `translateX(-${carrosselIndex * 100}%)`;
+
+            // Atualizar indicadores
+            indicadores.forEach((indicador, index) => {
+                indicador.classList.toggle('ativo', index === carrosselIndex);
+            });
+        }
+
+        // Autoplay do carrossel
+        function iniciarAutoplay() {
+            carrosselInterval = setInterval(() => {
+                moverCarrossel(1);
+            }, 5000); // Muda a cada 5 segundos
+        }
+
+        function reiniciarAutoplay() {
+            clearInterval(carrosselInterval);
+            iniciarAutoplay();
+        }
+
+        // Adicionar destaque ao pedido
+function destaqueParaPedido(index) {
+    if (!window.destaques || !window.destaques[index]) {
+        showNotification('Item não encontrado!', 'error');
+        return;
+    }
+
+    const destaque = window.destaques[index];
+
+    console.log("Procurando card para:", destaque.nome);
+
+    // Encontrar o card correspondente e simular clique
+    const cards = document.querySelectorAll('.item-card');
+    let cardEncontrado = false;
+
+    for (let card of cards) {
+        const tituloCard = card.querySelector('h3').textContent.toLowerCase().trim();
+        const tituloDestaque = destaque.nome.toLowerCase().trim();
+
+        console.log("Comparando:", tituloCard, "com", tituloDestaque);
+
+        // Lógica de correspondência mais flexível
+        if (tituloCard === tituloDestaque ||
+            tituloCard.includes(tituloDestaque) ||
+            tituloDestaque.includes(tituloCard)) {
+
+            console.log("Card encontrado! Clicando...");
+            card.click();
+            cardEncontrado = true;
+            break;
+        }
+    }
+
+    // Se não encontrou o card correspondente, adiciona diretamente
+    if (!cardEncontrado) {
+        console.log("Card não encontrado, adicionando diretamente");
+        
+        // Converter preço para número
+        const preco = typeof destaque.preco === 'string' ? 
+                      parseFloat(destaque.preco.replace(',', '.')) : 
+                      Number(destaque.preco);
+        
+        pedido.push({
+            nome: destaque.nome,
+            preco: preco
+        });
+        total += preco;
+        atualizarBarra();
+        showNotification(destaque.nome + ' adicionado ao pedido!', 'success');
+    }
+}
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            inicializarCarrossel();
+        });
+
+        // Pausar autoplay quando o mouse estiver sobre o carrossel
+        document.addEventListener('DOMContentLoaded', function () {
+            const carrossel = document.querySelector('.carrossel-container');
+            if (carrossel) {
+                carrossel.addEventListener('mouseenter', () => {
+                    clearInterval(carrosselInterval);
+                });
+
+                carrossel.addEventListener('mouseleave', () => {
+                    iniciarAutoplay();
+                });
+            }
+        });
+
+        // ===== SCROLL SUAVE SIMPLES E EFICAZ =====
+        document.addEventListener('DOMContentLoaded', function () {
+            // Seleciona todos os links do menu de navegação
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+            // Adiciona evento de clique para cada link
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+
+                    if (targetSection) {
+                        // Calcula a posição de forma mais simples
+                        const headerOffset = 120; // Ajuste este valor conforme necessário
+                        const elementPosition = targetSection.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        // Scroll suave
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        // ===== CONSULTA DE CEP VIA API =====
+        function consultarCEP() {
+            const cepInput = document.querySelector('input[placeholder="Ex: 00000-000"]');
+            const cep = cepInput.value.replace(/\D/g, ''); // Remove não números
+
+            // Verifica se CEP tem 8 dígitos
+            if (cep.length !== 8) {
+                showNotification('CEP deve conter 8 dígitos!', 'error');
+                return;
+            }
+
+            // Mostra loading
+            cepInput.disabled = true;
+            cepInput.style.background = '#f5f5f5';
+
+            // Faz a requisição para a API ViaCEP
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        showNotification('CEP não encontrado!', 'error');
+                        limparCamposEndereco();
+                    } else {
+                        preencherCamposEndereco(data);
+                        showNotification('Endereço preenchido automaticamente!', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao consultar CEP:', error);
+                    showNotification('Erro ao consultar CEP. Tente novamente.', 'error');
+                    limparCamposEndereco();
+                })
+                .finally(() => {
+                    cepInput.disabled = false;
+                    cepInput.style.background = '';
+                });
+        }
+
+        function preencherCamposEndereco(data) {
+            const inputs = document.querySelectorAll('.endereco-form input');
+
+            // Logradouro - índice 1 (segundo input)
+            if (inputs[1]) {
+                inputs[1].value = data.logradouro || '';
+                inputs[1].style.color = '#000000'; // Cor preta
+            }
+            // Bairro - índice 4 (quinto input)
+            if (inputs[4]) {
+                inputs[4].value = data.bairro || '';
+                inputs[4].style.color = '#000000'; // Cor preta
+            }
+            // Cidade - índice 5 (sexto input)
+            if (inputs[5]) {
+                inputs[5].value = data.localidade || '';
+                inputs[5].style.color = '#000000'; // Cor preta
+            }
+            // Estado - índice 6 (sétimo input)
+            if (inputs[6]) {
+                inputs[6].value = data.uf || '';
+                inputs[6].style.color = '#000000'; // Cor preta
+            }
+
+            // Atualiza o objeto enderecoEntrega
+            enderecoEntrega = {
+                cep: data.cep || '',
+                logradouro: data.logradouro || '',
+                bairro: data.bairro || '',
+                cidade: data.localidade || '',
+                estado: data.uf || '',
+                numero: enderecoEntrega.numero || '',
+                complemento: enderecoEntrega.complemento || ''
+            };
+        }
+
+        function limparCamposEndereco() {
+            const inputs = document.querySelectorAll('.endereco-form input');
+            // Mantém apenas o CEP e limpa os outros campos
+            for (let i = 1; i < inputs.length; i++) {
+                if (i !== 0) { // Não limpa o CEP
+                    inputs[i].value = '';
+                }
+            }
+        }
+
+        // Função para formatar CEP (00000-000)
+        // Função para formatar CEP (00000-000)
+        function formatarCEP(cep) {
+            cep = cep.replace(/\D/g, '');
+            cep = cep.replace(/(\d{5})(\d)/, '$1-$2');
+            return cep;
+        }
+
+        // Event listener para o input de CEP
+        document.addEventListener('DOMContentLoaded', function () {
+            // Adiciona evento de input para formatar CEP automaticamente
+            document.addEventListener('input', function (e) {
+                if (e.target.placeholder === 'Ex: 00000-000') {
+                    const cepOriginal = e.target.value;
+                    e.target.value = formatarCEP(e.target.value);
+
+                    // Se o usuário apagou todos os números, limpa os campos
+                    if (cepOriginal.replace(/\D/g, '').length === 0) {
+                        limparCamposEndereco();
+                    }
+
+                    // Consulta automática quando CEP estiver completo
+                    if (e.target.value.length === 9) { // 00000-000 = 9 caracteres
+                        consultarCEP();
+                    }
+                }
+            });
+        });
+
+        // Função para limpar campos de endereço
+        function limparCamposEndereco() {
+            const inputs = document.querySelectorAll('.endereco-form input');
+            // Limpa todos os campos exceto o CEP (primeiro input)
+            for (let i = 1; i < inputs.length; i++) {
+                inputs[i].value = '';
+                inputs[i].style.color = ''; // Remove a cor personalizada (volta ao padrão)
+            }
+
+            // Atualiza o objeto enderecoEntrega
+            enderecoEntrega = {
+                cep: '',
+                logradouro: '',
+                bairro: '',
+                cidade: '',
+                estado: '',
+                numero: '',
+                complemento: ''
+            };
+        }
+
+        // ===== SCROLL PARA O TOPO =====
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ===== MOSTRAR/ESCONDER BOTÃO =====
+        function toggleBackToTop() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        }
+
+        // ===== INICIALIZAR EVENT LISTENER =====
+        document.addEventListener('DOMContentLoaded', function () {
+            // Event listener para mostrar/esconder o botão
+            window.addEventListener('scroll', toggleBackToTop);
+
+            // Inicializar estado do botão
+            toggleBackToTop();
+        });
+
+        // ===== FUNÇÕES DE FORMATAÇÃO (MÁSCARAS) =====
+
+        // 1. Formatar Telefone/Celular ((00) 00000-0000)
+        function formatarTelefoneInput(input) {
+            // Remove tudo que não é dígito
+            let numeros = input.value.replace(/\D/g, '');
+
+            // Limita a 11 dígitos (DDD + 9 dígitos)
+            if (numeros.length > 11) {
+                numeros = numeros.substring(0, 11);
+            }
+
+            // Aplica a máscara: (00) 00000-0000
+            let formatado = '';
+            if (numeros.length > 0) {
+                formatado = '(' + numeros.substring(0, 2);
+            }
+            if (numeros.length > 2) {
+                formatado += ') ' + numeros.substring(2, 7);
+            }
+            if (numeros.length > 7) {
+                formatado += '-' + numeros.substring(7, 11);
+            }
+
+            // Atualiza o valor do input
+            input.value = formatado;
+
+            // Armazena no objeto enderecoEntrega (se existir)
+            if (window.enderecoEntrega) {
+                enderecoEntrega.telefone = formatado;
+            }
+        }
+
+        // 2. Formatar CEP (00000-000) - VERSÃO MELHORADA
+        function formatarCEPInput(input) {
+            // Remove tudo que não é dígito
+            let numeros = input.value.replace(/\D/g, '');
+
+            // Limita a 8 dígitos
+            if (numeros.length > 8) {
+                numeros = numeros.substring(0, 8);
+            }
+
+            // Aplica a máscara: 00000-000
+            let formatado = '';
+            if (numeros.length > 5) {
+                formatado = numeros.substring(0, 5) + '-' + numeros.substring(5, 8);
+            } else {
+                formatado = numeros;
+            }
+
+            // Atualiza o valor do input
+            input.value = formatado;
+
+            // Armazena no objeto enderecoEntrega (se existir)
+            if (window.enderecoEntrega) {
+                enderecoEntrega.cep = numeros; // Salva apenas números
+
+                // Consulta automática quando CEP estiver completo (8 dígitos)
+                if (numeros.length === 8) {
+                    consultarCEP();
+                }
+            }
+        }
+
+        // 3. Validar Número da Casa (apenas números, máximo 4 dígitos)
+        function validarNumeroCasa(input) {
+            // Permite apenas números
+            input.value = input.value.replace(/\D/g, '');
+
+            // Limita a 4 dígitos
+            if (input.value.length > 4) {
+                input.value = input.value.substring(0, 4);
+            }
+
+            // Armazena no objeto enderecoEntrega (se existir)
+            if (window.enderecoEntrega) {
+                enderecoEntrega.numero = input.value;
+            }
+        }
+
+        // 4. Validar Nome Completo (apenas letras e espaços)
+        function validarNomeCompleto(input) {
+            // Permite letras (incluindo acentuadas), espaços e alguns caracteres especiais comuns em nomes
+            input.value = input.value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, '');
+
+            // Armazena no objeto enderecoEntrega (se existir)
+            if (window.enderecoEntrega) {
+                enderecoEntrega.nome = input.value;
+            }
+        }
+
+        // 5. Função auxiliar para formatar qualquer telefone
+        function formatarTelefone(telefone) {
+            let numeros = telefone.replace(/\D/g, '');
+
+            // Limita a 11 dígitos
+            if (numeros.length > 11) {
+                numeros = numeros.substring(0, 11);
+            }
+
+            let formatado = '';
+            if (numeros.length > 0) {
+                formatado = '(' + numeros.substring(0, 2);
+            }
+            if (numeros.length > 2) {
+                formatado += ') ' + numeros.substring(2, 7);
+            }
+            if (numeros.length > 7) {
+                formatado += '-' + numeros.substring(7, 11);
+            }
+
+            return formatado;
+        }
+
+        // 6. Função auxiliar para formatar qualquer CEP
+        function formatarCEP(cep) {
+            let numeros = cep.replace(/\D/g, '');
+
+            // Limita a 8 dígitos
+            if (numeros.length > 8) {
+                numeros = numeros.substring(0, 8);
+            }
+
+            if (numeros.length > 5) {
+                return numeros.substring(0, 5) + '-' + numeros.substring(5, 8);
+            }
+
+            return numeros;
+        }
+
+        // ===== FUNÇÃO PARA CARREGAR CARDÁPIO DO BANCO =====
+async function carregarCardapioDoBanco() {
+    try {
+        const response = await fetch('cardapio.php');
+        const data = await response.json();
+        
+        console.log('Dados recebidos do PHP:', data);
+        
+        if (data.sucesso && data.cardapio) {
+            cardapioData = data.cardapio;
+            popularCardapio(cardapioData);
+            
+            // ATUALIZAR CARROSSEL APÓS CARREGAR CARDÁPIO
+            setTimeout(() => {
+                atualizarDestaquesCarrossel();
+            }, 500);
+            
+        } else {
+            console.error('Erro ao carregar cardápio:', data.error);
+            usarCardapioPadrao();
+        }
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        usarCardapioPadrao();
+    }
+}
+
+// ===== POPULAR O CARDÁPIO DINAMICAMENTE =====
+function popularCardapio(cardapioAgrupado) {
+    // Mapear as categorias do banco para os IDs das seções
+    const mapeamento = {
+        'hamburgueres': 'grid-hamburgueres',
+        'acompanhamentos': 'grid-acompanhamentos',
+        'bebidas': 'grid-bebidas',
+        'sobremesas': 'grid-sobremesas'
+    };
+    
+    for (const [categoria, gridId] of Object.entries(mapeamento)) {
+        const grid = document.getElementById(gridId);
+        if (grid && cardapioAgrupado[categoria]) {
+            grid.innerHTML = ''; // Limpa os itens estáticos
+            
+            cardapioAgrupado[categoria].forEach(item => {
+                const tipo = determinarTipoItem(item);
+                const itemCard = criarItemCardHTML(item, tipo, item.status);
+                grid.innerHTML += itemCard;
+            });
+        }
+    }
+}
+
+// ===== DETERMINAR TIPO DO ITEM PARA MODAL =====
+function determinarTipoItem(item) {
+    const nomeLower = item.nome.toLowerCase();
+    const categoria = item.categoria;
+    
+    if (categoria === 'hamburguer') {
+        return nomeLower.includes('vegan') ? 'vegano' : 'hamburguer';
+    } else if (categoria === 'bebida') {
+        return nomeLower.includes('água') || nomeLower.includes('agua') ? 'agua' : 'bebida';
+    } else {
+        return categoria;
+    }
+}
+
+// ===== CRIAR HTML DO CARD (MODIFICADO PARA ACEITAR STATUS) =====
+function criarItemCardHTML(item, tipo, status = 1) {
+    const preco = typeof item.preco === 'string' ? 
+                  parseFloat(item.preco.replace(',', '.')) : 
+                  Number(item.preco);
+    const isInativo = (status === 0);
+    
+    // Se estiver inativo, o onclick fica vazio (não faz nada)
+    const onclickAction = isInativo ? '' : `openProductModal('${escapeString(item.nome)}', ${preco}, '${escapeString(item.descricao || '')}', '${tipo}')`;
+    
+    return `
+        <div class="item-card ${isInativo ? 'item-inativo' : ''}" ${onclickAction ? `onclick="${onclickAction}"` : ''}>
+            <div class="item-image">
+                <img src="${item.imagem || getImagemPadrao(item.nome, item.categoria)}" alt="${item.nome}">
+            </div>
+            <div class="item-info">
+                <h3>${item.nome}</h3>
+                <p>${item.descricao || ''}</p>
+                <div class="item-price">R$ ${preco.toFixed(2).replace('.', ',')}</div>
+            </div>
+        </div>
+    `;
+}
+
+// ===== FUNÇÃO AUXILIAR PARA ESCAPAR STRINGS =====
+function escapeString(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ===== OBTER IMAGEM PADRÃO =====
+function getImagemPadrao(nome, categoria) {
+    const nomeLower = nome.toLowerCase();
+    
+    const imagens = {
+        'clássico': 'imagens/Hambúrguer_Clássico.avif',
+        'bacon': 'imagens/hambúrguer_Bacon.jpg',
+        'queijo': 'imagens/Hambúrguer_Queijo_Duplo.avif',
+        'picante': 'imagens/hambúrguer_picante.jpg',
+        'vegano': 'imagens/hambúrguer_vegano.jpg',
+        'supremo': 'imagens/Mestre_Supremo.avif',
+        'batata': 'imagens/batata_frita.jpg',
+        'cebola': 'imagens/aneis_cebola.webp',
+        'bacon': 'imagens/bacon_crocante.jpg',
+        'refrigerante': 'imagens/refrigerante.avif',
+        'cerveja': 'imagens/cerveja.avif',
+        'suco': 'imagens/suco_natural.avif',
+        'água': 'imagens/Agua.webp',
+        'milkshake': 'imagens/milkshake.avif',
+        'brownie': 'imagens/brownie.avif',
+        'cheesecake': 'imagens/cheesecake.avif'
+    };
+    
+    for (const [palavra, caminho] of Object.entries(imagens)) {
+        if (nomeLower.includes(palavra)) {
+            return caminho;
+        }
+    }
+    
+    // Retorno padrão por categoria
+    const padroesPorCategoria = {
+        'hamburguer': 'imagens/Hambúrguer_Clássico.avif',
+        'acompanhamento': 'imagens/batata_frita.jpg',
+        'bebida': 'imagens/refrigerante.avif',
+        'sobremesa': 'imagens/milkshake.avif'
+    };
+    
+    return padroesPorCategoria[categoria] || 'imagens/Hambúrguer_Clássico.avif';
+}
+
+// ===== VARIÁVEIS PARA CONTROLE DE ATUALIZAÇÃO =====
+let intervaloAtualizacao = null;
+let estaAtualizando = false;
+
+// ===== FUNÇÃO PARA BUSCAR CARDÁPIO DO BANCO =====
+async function buscarCardapio() {
+    if (estaAtualizando) return; // Evita múltiplas requisições simultâneas
+    
+    estaAtualizando = true;
+    
+    try {
+        console.log('🔄 Atualizando cardápio...');
+        
+        const response = await fetch('cardapio.php');
+        const data = await response.json();
+        
+        if (data.sucesso && data.cardapio) {
+            cardapioData = data.cardapio;
+            popularCardapio(cardapioData);
+            
+            // Atualizar também os destaques do carrossel
+            atualizarDestaquesCarrossel();
+            
+            console.log('✅ Cardápio atualizado com sucesso!');
+        } else {
+            console.error('Erro ao atualizar cardápio:', data.error);
+        }
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+    } finally {
+        estaAtualizando = false;
+    }
+}
+// ===== INICIAR ATUALIZAÇÃO AUTOMÁTICA =====
+function iniciarAtualizacaoAutomatica(intervaloSegundos = 30) {
+    // Para qualquer intervalo existente
+    if (intervaloAtualizacao) {
+        clearInterval(intervaloAtualizacao);
+    }
+    
+    // Busca imediatamente ao iniciar
+    buscarCardapio();
+    
+    // Configura intervalo para buscar novamente
+    intervaloAtualizacao = setInterval(() => {
+        buscarCardapio();
+    }, intervaloSegundos * 1000);
+    
+    console.log(`⏰ Atualização automática configurada a cada ${intervaloSegundos} segundos`);
+}
+
+// ===== PARAR ATUALIZAÇÃO AUTOMÁTICA =====
+function pararAtualizacaoAutomatica() {
+    if (intervaloAtualizacao) {
+        clearInterval(intervaloAtualizacao);
+        intervaloAtualizacao = null;
+        console.log('⏹️ Atualização automática parada');
+    }
+}
+
+
+// ===== MODIFICAR A FUNÇÃO DE CARREGAMENTO INICIAL =====
+// Estou Substitundo a chamada DOMContentLoaded por esta:
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Carregar cardápio e iniciar atualização automática *******************
+    iniciarAtualizacaoAutomatica(10); // Atualiza a cada 10 segundos posso modificar para ver 
+    
+    // Adicionar indicador visual (opcional)
+    //adicionarIndicadorAtualizacao();
+    
+    // Resto das suas inicializações...
+    atualizarBarra();
+    // ... outras inicializações que você já tinha
+});
+
+// ===== USAR CARDÁPIO PADRÃO SE FALHAR =====
+function usarCardapioPadrao() {
+    // Mantém os itens estáticos que já estão no HTML
+    console.log('Usando cardápio estático');
+}
+
+// ===== CHAMAR QUANDO A PÁGINA CARREGAR =====
+document.addEventListener('DOMContentLoaded', function() {
+    carregarCardapioDoBanco();
+});
+    </script>
+</body>
+
+</html>
